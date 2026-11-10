@@ -241,7 +241,7 @@ final class AboutWindow: NSWindowController {
     var onRollback: (() -> Void)?
 
     convenience init() {
-        let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 380, height: 440), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 380, height: 360), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         w.title = "앱 정보"
         w.isReleasedWhenClosed = false
         self.init(window: w)
@@ -285,14 +285,14 @@ final class AboutWindow: NSWindowController {
         stack.setCustomSpacing(16, after: img); stack.setCustomSpacing(18, after: buttons)
         stack.edgeInsets = NSEdgeInsets(top: 28, left: 20, bottom: 22, right: 20)
         stack.translatesAutoresizingMaskIntoConstraints = false
-        let content = NSView(frame: NSRect(x: 0, y: 0, width: 380, height: 440))
+        let content = NSView(frame: NSRect(x: 0, y: 0, width: 380, height: 360))
         content.addSubview(stack)
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: content.leadingAnchor), stack.trailingAnchor.constraint(equalTo: content.trailingAnchor),
             stack.topAnchor.constraint(equalTo: content.topAnchor), stack.bottomAnchor.constraint(lessThanOrEqualTo: content.bottomAnchor)
         ])
         window?.contentView = content
-        window?.setContentSize(NSSize(width: 380, height: 440))
+        window?.setContentSize(NSSize(width: 380, height: 360))
         content.layoutSubtreeIfNeeded()
         window?.center()
     }
