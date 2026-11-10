@@ -28,5 +28,9 @@
 - `download/ShepherdLORD-Windows.zip` (폴더 ShepherdLORD/ 안에 exe · dll · version.txt · 사용가이드.png) 최신판 1개만.
 - README 맨 위 "윈도우 앱 받기" 링크는 버전이 바뀌어도 그대로.
 
+## 기록
+- 2026-11-10 v1.0.0 첫 빌드. 윈도우 빌드 서버(Windows NT 10.0.26100, WebView2 156)에서 시험 통과: 여는 중 → 실제 웹앱 열림(제목 "영복교회 성도 돌봄") → 끊김 화면 → 앱 정보. 내려받기 zip 약 0.8MB.
+  웹앱 위쪽에 구글의 "This application was created by a Google Apps Script user" 안내 띠가 보임(구글이 넣는 것, X 로 닫을 수 있음).
+
 ## 할 일
-- [ ] 첫 빌드 · 시험 · 내려받기 올리기
+- [ ] 실제 사용자 PC 에서 처음 실행(PC 보호 창), 사진 · 엑셀 올리기 파일 창 확인
