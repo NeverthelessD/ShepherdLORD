@@ -6,6 +6,7 @@ on:
     paths:
       - 'windows/**'
       - 'scripts/ci-windows.ps1'
+      - 'scripts/push-ci-results.sh'
       - '.github/workflows/build-windows.yml'
   workflow_dispatch:
 
@@ -27,15 +28,12 @@ jobs:
         shell: pwsh
         run: ./scripts/ci-windows.ps1
 
-      - name: Publish results to ci-results branch
+      - name: Publish results to ci-results/windows
         if: always()
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ci-out
           echo "commit=$GITHUB_SHA" >> ci-out/status.txt
-          cd ci-out
-          git init -q
-          git checkout -q -b ci-results
-          git add -A
-          git -c user.name="Nevertheless_D" -c user.email="NeverthelessD@users.noreply.github.com" commit -qm "windows ci $GITHUB_SHA"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" ci-results
+          bash scripts/push-ci-results.sh windows ci-out

@@ -1,0 +1,36 @@
+name: build-mac
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'scripts/build-mac.sh'
+      - 'scripts/smoke-mac.sh'
+      - 'scripts/ci-mac.sh'
+      - '.github/workflows/build-mac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ci-results-mac
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, smoke test, package
+        run: bash scripts/ci-mac.sh
+      - name: Publish results to ci-results/mac
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ci-out
+          echo "commit=$GITHUB_SHA" >> ci-out/status.txt
+          bash scripts/push-ci-results.sh mac ci-out
