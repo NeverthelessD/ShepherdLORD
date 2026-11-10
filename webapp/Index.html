@@ -176,7 +176,7 @@ function esc(s) {
 function today() { return (S.data && S.data.today) || new Date().toISOString().slice(0, 10); }
 function fmtDate(d) { if (!d) return ''; var p = String(d).split('-'); return p.length === 3 ? p[0] + '. ' + Number(p[1]) + '. ' + Number(p[2]) : d; }
 function shortDate(d) { if (!d) return ''; var p = String(d).split('-'); return p.length === 3 ? p[1] + '.' + p[2] : d; }
-function birthLabel(y) { y = String(y || '').trim(); if (!/^\d{4}$/.test(y)) return y; var age = new Date().getFullYear() - Number(y); return y.slice(2) + '년생' + (age >= 0 && age < 130 ? ' (' + age + '세)' : ''); }
+function birthLabel(y) { y = String(y || '').trim(); if (!/^\d{4}$/.test(y)) return y; var age = new Date().getFullYear() - Number(y) + 1; return y.slice(2) + '년생' + (age >= 0 && age < 130 ? ' (' + age + '세)' : ''); }
 function dayDiff(d) {
   if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
   var a = new Date(today() + 'T00:00:00'), b = new Date(d + 'T00:00:00');
