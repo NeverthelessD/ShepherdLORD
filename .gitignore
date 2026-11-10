@@ -1,0 +1,6 @@
+bin/
+obj/
+build/
+ci-out/
+*.user
+.vs/

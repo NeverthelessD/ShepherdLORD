@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>영복교회 성도 돌봄</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#F6F4EF;--surface:#FFFFFF;--text:#1E2622;--sub:#5C6660;--line:#E4E0D8;--green:#2E6B57;--on-green:#FFFFFF;--green-bg:#E3EFE8;--green-text:#1F5242;--rose-text:#8A3628}
+@media (prefers-color-scheme: dark){:root{--bg:#121715;--surface:#1C2320;--text:#EAEFEC;--sub:#A3ADA8;--line:#2C3531;--green:#7CC4A8;--on-green:#0F1F19;--green-bg:#1F3A30;--green-text:#A9DCC7;--rose-text:#F2BDB2}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:16px;text-align:center}
+.ico{width:64px;height:64px;border-radius:20px;background:var(--green-bg);color:var(--green-text);display:flex;align-items:center;justify-content:center;margin:0 auto}
+h1{margin:0;font-family:'Gowun Batang',serif;font-size:28px}
+p{margin:0;font-size:14px;line-height:1.7;color:var(--sub)}
+.btn{min-height:48px;border-radius:12px;border:0;background:var(--green);color:var(--on-green);font:inherit;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.btn.line{background:transparent;color:var(--text);border:1px solid var(--line)}
+label{display:flex;flex-direction:column;gap:6px;text-align:left;font-size:12px;color:var(--sub)}
+input{height:46px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:14px;width:100%}
+.err{color:var(--rose-text);font-size:13px;min-height:18px;text-align:left}
+.foot{font-size:11px;color:var(--sub);letter-spacing:.3px}
+.hide{display:none!important}
+.small{font-size:12px}
+.help{text-align:left;border-radius:14px;background:var(--bg);border:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.help h2{margin:0;font-size:15px;color:var(--text)}
+.help ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:var(--text)}
+.help b{font-weight:500}
+.copy{min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="ico" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 12c0-3 2.5-5 6-5 0 3.5-2.5 5-6 5z"/></svg></div>
+  <div><p style="font-size:13px">영복교회</p><h1>성도 돌봄</h1></div>
+
+  <section id="go" class="hide" style="display:flex;flex-direction:column;gap:12px">
+    <p id="goMsg">앱을 여는 중이에요…</p>
+    <a id="goBtn" class="btn" href="#">앱 열기</a>
+    <section class="help" id="help" aria-labelledby="helpTitle">
+      <h2 id="helpTitle">"현재 파일을 열 수 없습니다"가 나오면</h2>
+      <p style="color:var(--sub)">브라우저에 구글 계정이 여러 개 로그인되어 있을 때 생겨요. 앱 문제는 아니에요. 아래 중 하나로 열어 주세요.</p>
+      <ol>
+        <li><b>맥 (가장 추천)</b>: 사파리에서 앱을 연 뒤, 메뉴 "파일 → Dock에 추가". Dock 아이콘으로 열면 구글 계정과 상관없이 열려요.</li>
+        <li><b>시크릿 창</b>: 크롬 시크릿 창(맥 ⌘+Shift+N, 윈도우 Ctrl+Shift+N)에 앱 주소를 붙여넣어요.</li>
+        <li><b>다른 브라우저</b>: 구글에 로그인하지 않은 브라우저(사파리, 엣지 등)로 이 파일이나 앱 주소를 열어요.</li>
+      </ol>
+      <button type="button" class="copy" id="copyBtn">앱 주소 복사하기</button>
+    </section>
+    <button type="button" class="btn line" id="changeBtn">앱 주소 바꾸기</button>
+  </section>
+
+  <section id="setup" class="hide" style="display:flex;flex-direction:column;gap:12px">
+    <p>처음 한 번만 앱 주소를 넣어 주세요.<br>관리자에게 받은 웹 앱 주소(…/exec 로 끝나는 주소)를 붙여넣으면 돼요.</p>
+    <label for="url">앱 주소
+      <input id="url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    </label>
+    <div class="err" id="err" role="alert"></div>
+    <button type="button" class="btn" id="saveBtn">저장하고 열기</button>
+    <p class="small">한 번 저장하면 다음부터는 이 파일을 열기만 해도 바로 앱으로 넘어가요.</p>
+  </section>
+
+  <p class="small">앱에서 접속 코드를 입력하면, 다른 관리자와 같은 명단을 실시간으로 보고 고칠 수 있어요.</p>
+  <p class="foot">made by. Nevertheless_D</p>
+</main>
+<script>
+(function () {
+  // 관리자가 아래 따옴표 안에 웹 앱 주소를 넣어 두면, 동료는 주소를 따로 넣지 않아도 돼요.
+  var APP_URL = 'https://script.google.com/macros/s/AKfycbyTieV3DIEnEtg6fZesuIIP6iY0v8NOo0ZnVmPFQZ8-IuFGbP_wq4uBZnWNKhrNEY4h8A/exec';
+
+  var KEY = 'yb_app_url';
+  function load() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  function save(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  function valid(u) { return /^https:\/\/script\.google\.com\/(a\/[^\/]+\/)?macros\/s\/[A-Za-z0-9_-]+\/exec\/?$/.test(u); }
+
+  var go = document.getElementById('go'), setup = document.getElementById('setup');
+  var timer = null;
+
+  function showGo(u) {
+    setup.classList.add('hide'); go.classList.remove('hide');
+    document.getElementById('goBtn').href = u;
+    var tried = false;
+    try { tried = sessionStorage.getItem('yb_tried') === '1'; } catch (e) {}
+    if (tried) {
+      // 앱에서 뒤로 돌아왔다면 자동으로 넘어가지 않고 안내를 보여줘요
+      document.getElementById('goMsg').textContent = '앱이 열리지 않았다면 아래 안내를 봐 주세요.';
+      document.getElementById('goBtn').textContent = '다시 열어 보기';
+      return;
+    }
+    document.getElementById('goMsg').textContent = '앱을 여는 중이에요… 열리지 않으면 뒤로 가기를 눌러 아래 안내를 봐 주세요.';
+    timer = setTimeout(function () {
+      try { sessionStorage.setItem('yb_tried', '1'); } catch (e) {}
+      window.location.href = u;
+    }, 1500);
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) { clearTimeout(timer); var cur = load() || APP_URL; if (valid(cur)) showGo(cur); } });
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var cur = document.getElementById('goBtn').href, b = this;
+    function done() { b.textContent = '복사했어요. 시크릿 창이나 다른 브라우저 주소창에 붙여넣으세요.'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cur).then(done, function () { window.prompt('아래 주소를 복사하세요', cur); });
+    else window.prompt('아래 주소를 복사하세요', cur);
+  });
+  function showSetup(prefill) {
+    clearTimeout(timer);
+    go.classList.add('hide'); setup.classList.remove('hide');
+    var i = document.getElementById('url'); i.value = prefill || ''; i.focus();
+  }
+
+  document.getElementById('changeBtn').addEventListener('click', function () { showSetup(load() || APP_URL); });
+  document.getElementById('saveBtn').addEventListener('click', submit);
+  document.getElementById('url').addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+  document.getElementById('url').addEventListener('input', function () { document.getElementById('err').textContent = ''; });
+  function submit() {
+    var u = document.getElementById('url').value.trim();
+    if (!valid(u)) { document.getElementById('err').textContent = '주소가 맞지 않아요. https://script.google.com/macros/s/ 로 시작하고 /exec 로 끝나는 주소를 넣어 주세요.'; return; }
+    save(u); showGo(u);
+  }
+
+  var u = load() || APP_URL;
+  if (!valid(u)) u = APP_URL;
+  if (valid(u)) showGo(u); else showSetup('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#F6F4EF;--surface:#FFFFFF;--text:#1E2622;--sub:#5C6660;--line:#E4E0D8;--green:#2E6B57;--on-green:#FFFFFF;--green-bg:#E3EFE8;--green-text:#1F5242;--rose-bg:#F8E7E2;--rose-text:#8A3628;--amber-bg:#FBF0D9;--amber-text:#6E4A0E;--chip:#EFECE6;--pink-bg:#F6E6EE;--pink-text:#7A2E52}
+@media (prefers-color-scheme: dark){:root{--bg:#121715;--surface:#1C2320;--text:#EAEFEC;--sub:#A3ADA8;--line:#2C3531;--green:#7CC4A8;--on-green:#0F1F19;--green-bg:#1F3A30;--green-text:#A9DCC7;--rose-bg:#3D2420;--rose-text:#F2BDB2;--amber-bg:#3A2F17;--amber-text:#F0CF8A;--chip:#26302C;--pink-bg:#3A2230;--pink-text:#F2BFD6}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{max-width:720px;margin:0 auto;min-height:100vh;padding-bottom:110px}
+.serif{font-family:'Gowun Batang',serif;font-weight:700}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px}
+.top .title{font-size:15px;font-weight:500}
+.ibtn{width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;border-radius:12px;flex-shrink:0}
+.ibtn:hover{background:var(--chip)}
+.btn{min-height:40px;padding:0 16px;border-radius:10px;border:0;background:var(--green);color:var(--on-green);font-size:14px;font-weight:500}
+.btn.line{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--rose-text);border:1px solid var(--line)}
+.btn.wide{width:100%;min-height:48px;font-size:15px}
+.btn:disabled{opacity:.6}
+.pad{padding:0 20px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.sec{padding:18px;display:flex;flex-direction:column;gap:14px}
+.sec h2{margin:0;font-size:15px;font-weight:700}
+.row-between{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.muted{color:var(--sub)}
+.small{font-size:12px}
+.chip{font-size:12px;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.chip.green{background:var(--green-bg);color:var(--green-text)}
+.chip.rose{background:var(--rose-bg);color:var(--rose-text)}
+.chip.amber{background:var(--amber-bg);color:var(--amber-text)}
+.chip.pink{background:var(--pink-bg);color:var(--pink-text)}
+.chip.gray{background:var(--chip);color:var(--sub)}
+.chip.plain{background:var(--chip);color:var(--text);font-weight:500}
+button.chip{border:0;min-height:32px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+.search{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);color:var(--sub)}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:15px;color:var(--text);min-width:0}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;border-radius:12px;background:var(--chip);flex:1;max-width:360px}
+.tabs button{min-height:38px;border-radius:9px;border:0;background:transparent;color:var(--sub);font-size:14px}
+.tabs button.on{background:var(--surface);color:var(--text);font-weight:500}
+.check-line{display:flex;align-items:center;gap:8px;font-size:14px}
+.check-line .mk{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.filters button.on{background:var(--green);color:var(--on-green);border-color:var(--green);font-weight:500}
+.list{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:0 20px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.item.open{border:1.5px solid var(--green)}
+.item-main{width:100%;border:0;background:transparent;text-align:left;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.thumb{position:relative;width:48px;height:56px;flex-shrink:0;border-radius:12px;background:var(--green-bg);color:var(--green-text);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .no{position:absolute;left:4px;top:4px;font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:var(--surface);color:var(--sub)}
+.edu{display:flex;gap:3px}
+.edu span{width:18px;height:18px;border-radius:5px;font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;background:var(--chip);color:var(--sub)}
+.edu span.done{background:var(--green);color:var(--on-green)}
+.members{border-top:1px solid var(--line);background:var(--bg);padding:4px 14px 8px 74px}
+.members button{width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;border-bottom:1px solid var(--line);background:transparent;font-size:14px;text-align:left}
+.members button:last-child{border-bottom:0}
+.linkbtn{border:0;background:transparent;color:var(--green);font-size:13px;font-weight:500;min-height:36px;padding:0}
+.field{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--sub)}
+.field input,.field select,.field textarea,.inp{height:44px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px;min-width:0;width:100%}
+.field textarea{height:auto;padding:10px 12px;line-height:1.6;resize:vertical;min-height:96px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.seg label{min-height:44px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:6px;font-size:15px;cursor:pointer;padding:0 4px;text-align:center;word-break:keep-all}
+.seg label input{width:18px;height:18px}
+input[type=date]{position:relative}
+input[type=date][data-empty="1"]:not(:focus){color:transparent}
+input[type=date][data-empty="1"]:not(:focus)::-webkit-datetime-edit{color:transparent}
+input[type=date][data-empty="1"]:not(:focus)::before{content:attr(data-ph);color:var(--sub);position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none}
+.seg label.on{border:2px solid var(--green);background:var(--green-bg);color:var(--green-text);font-weight:500}
+input[type=checkbox],input[type=radio]{accent-color:var(--green);width:20px;height:20px;margin:0;flex-shrink:0}
+.check-row{display:flex;align-items:center;justify-content:space-between;min-height:44px;font-size:15px;gap:10px}
+.edu-box{min-height:58px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;gap:10px;cursor:pointer}
+.edu-box.done{border-color:var(--green);background:var(--green-bg);color:var(--green-text)}
+.info-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.info-row:last-child{border-bottom:0}
+.info-row span:last-child{font-weight:500;text-align:right}
+.photo{position:relative;flex-shrink:0}
+.photo .frame{width:100%;height:100%;border-radius:22px;background:var(--green-bg);color:var(--green-text);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.photo.rose .frame{background:var(--rose-bg);color:var(--rose-text)}
+.photo img{width:100%;height:100%;object-fit:cover}
+.photo .cam{position:absolute;right:-8px;bottom:-8px;width:44px;height:44px;border-radius:50%;border:3px solid var(--bg);background:var(--green);color:var(--on-green);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sil{opacity:.45}
+.addbtn{min-height:48px;border-radius:14px;border:1.5px dashed var(--line);background:transparent;color:var(--green);display:flex;align-items:center;justify-content:center;gap:6px;font-size:15px;font-weight:500;width:100%}
+.err{color:var(--rose-text);font-size:13px;min-height:18px}
+.notice{padding:12px 14px;border-radius:12px;background:var(--green-bg);color:var(--green-text);font-size:13px;line-height:1.6;margin:0}
+.lockbar{min-height:48px;padding:0 16px;border-radius:14px;background:var(--chip);color:var(--sub);display:flex;align-items:center;gap:10px;font-size:13px;border:0;width:100%;text-align:left}
+.footer{text-align:center;font-size:11px;color:var(--sub);padding:20px 0 8px;letter-spacing:.3px}
+.home-card{display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:var(--surface);border:1px solid var(--line);width:100%;text-align:left}
+.home-card .ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.big{font-size:40px;font-weight:700;letter-spacing:-1px}
+.log{display:flex;flex-direction:column;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.log div{padding:12px 16px;display:flex;justify-content:space-between;gap:12px;font-size:13px;border-bottom:1px solid var(--line)}
+.log div:last-child{border-bottom:0}
+.fab{position:fixed;right:max(20px,calc(50% - 340px));bottom:calc(96px + env(safe-area-inset-bottom));height:52px;padding:0 20px;border-radius:26px;border:0;background:var(--green);color:var(--on-green);display:flex;align-items:center;gap:6px;font-size:15px;font-weight:500;z-index:5}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:6}
+nav.bottom .in{display:flex;justify-content:space-around;width:100%;max-width:720px;padding:8px 0 calc(10px + env(safe-area-inset-bottom))}
+nav.bottom button{min-width:64px;min-height:44px;border:0;background:transparent;color:var(--sub);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.bottom button.on{color:var(--green);font-weight:500}
+.keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-width:340px}
+.key{height:62px;border-radius:16px;border:0;background:var(--surface);font-size:24px;font-weight:500}
+.key.ok{background:var(--green);color:var(--on-green);font-size:17px}
+.pin{display:flex;gap:16px;min-height:32px;align-items:center}
+.pin span{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
+.pin span.on{background:var(--green);border-color:var(--green)}
+#toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;z-index:20;text-align:center}
+#toast.show{opacity:1}
+#busy{position:fixed;left:0;top:0;height:3px;width:100%;background:var(--green);transform-origin:left;animation:busy 1.2s ease-in-out infinite;z-index:30;display:none}
+#busy.show{display:block}
+@keyframes busy{0%{transform:scaleX(0)}60%{transform:scaleX(.8)}100%{transform:scaleX(1);opacity:0}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px}
+.modal .box{background:var(--surface);border-radius:18px;padding:22px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:18px}
+.modal p{margin:0;font-size:15px;line-height:1.6}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end}
+.empty{padding:40px 20px;text-align:center;color:var(--sub);font-size:14px;line-height:1.7}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hide-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+@media (min-width:900px){
+  .wrap{max-width:1040px}
+  .list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .narrow{max-width:640px;margin:0 auto}
+  nav.bottom .in{max-width:1040px}
+  .fab{right:max(20px,calc(50% - 500px))}
+}
+</style>
+</head>
+<body>
+<div id="busy"></div>
+<div id="app" class="wrap"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+'use strict';
+
+/* ---------- 상태 ---------- */
+var S = {
+  token: null, roles: [], data: null, version: '0', lastSync: null,
+  screen: 'loading', params: {}, draft: null, draftKey: null, dirty: false,
+  code: '', loginMsg: '', loginLocked: false,
+  qNew: '', filterNew: 'all', tabNew: 'active', yearNew: 'all', openFam: {}, qPat: '', filterPat: 'all', qPreg: '', filterPreg: 'all',
+  photo: {}, busy: 0, err: {}
+};
+var EDU = ['1강', '2강', '3강', '4강'];
+var NEW_EDITABLE = ['관계', '신앙세대주', '이름', '성별', '연생', '등록일', '인도자', '1강', '2강', '3강', '4강', '등록심방', '전도회', '목장연결', '목장', '신급', '수료식'];
+var PAT_EDITABLE = ['이름', '성별', '연생', '병명', '병원', '상황', '상황메모', '다음진료일', '직분', '최근통화'];
+var GRADES = ['학습', '세례', '입교', '없음'];
+var PREG_EDITABLE = ['이름', '연생', '아기성별', '출산예정일', '몇째', '메모', '조리원', '조리원입소', '조리원퇴소', '출산방법', '직분'];
+var BIRTH_WAYS = ['자연분만', '제왕절개', '미정'];
+var BABY = ['아들', '딸', '미정'];
+var ORDERS = ['첫째', '둘째', '셋째', '넷째 이상'];
+var STATUSES = ['입원', '통원치료', '재활', '가료', '요양', '정기검진', '그 외'];
+var RELATIONS = ['본인', '남편', '아내', '아들', '딸', '아버지', '어머니', '형제자매', '기타'];
+var app = document.getElementById('app');
+
+function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+var DEVICE = load('yb_device');
+if (!DEVICE) { DEVICE = 'd' + Math.random().toString(36).slice(2) + Date.now().toString(36); store('yb_device', DEVICE); }
+
+/* ---------- 도구 ---------- */
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function today() { return (S.data && S.data.today) || new Date().toISOString().slice(0, 10); }
+function fmtDate(d) { if (!d) return ''; var p = String(d).split('-'); return p.length === 3 ? p[0] + '. ' + Number(p[1]) + '. ' + Number(p[2]) : d; }
+function shortDate(d) { if (!d) return ''; var p = String(d).split('-'); return p.length === 3 ? p[1] + '.' + p[2] : d; }
+function birthLabel(y) { y = String(y || '').trim(); return /^\d{4}$/.test(y) ? y.slice(2) + '년생' : (y ? y : ''); }
+function dayDiff(d) {
+  if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  var a = new Date(today() + 'T00:00:00'), b = new Date(d + 'T00:00:00');
+  return Math.round((b - a) / 86400000);
+}
+function dLabel(n) { return n === null ? '' : (n === 0 ? '오늘' : (n > 0 ? 'D-' + n : 'D+' + (-n))); }
+function weekday(d) { var n = new Date(d + 'T00:00:00').getDay(); return ['일', '월', '화', '수', '목', '금', '토'][n]; }
+function relTime(t) {
+  if (!t) return '';
+  var d = new Date(String(t).replace(' ', 'T') + ':00');
+  var m = Math.round((Date.now() - d.getTime()) / 60000);
+  if (isNaN(m)) return t;
+  if (m < 1) return '방금';
+  if (m < 60) return m + '분 전';
+  if (m < 60 * 24) return Math.floor(m / 60) + '시간 전';
+  if (m < 60 * 48) return '어제';
+  return (d.getMonth() + 1) + '/' + d.getDate();
+}
+function pad2(n) { n = String(n || ''); return n.length < 2 ? '0' + n : n; }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function canViewNew() { return S.roles.indexOf('newView') >= 0 || S.roles.indexOf('newEdit') >= 0; }
+function canEditNew() { return S.roles.indexOf('newEdit') >= 0; }
+function canPat() { return S.roles.indexOf('patient') >= 0; }
+function canPreg() { return S.roles.indexOf('pregnancy') >= 0; }
+function pregs() { return (S.data && S.data.pregnancies) || []; }
+function careState(p) {
+  var a = dayDiff(p['조리원입소']), b = dayDiff(p['조리원퇴소']);
+  if (a === null) return '';
+  if (a > 0) return 'before';
+  if (b === null || b >= 0) return 'now';
+  return 'after';
+}
+function careLabel(p) {
+  if (!p['조리원입소'] && !p['조리원']) return '';
+  var range = p['조리원입소'] ? shortDate(p['조리원입소']) + (p['조리원퇴소'] ? '~' + shortDate(p['조리원퇴소']) : '~') : '날짜 미정';
+  return '조리원 ' + (p['조리원'] ? p['조리원'] + ' ' : '') + range;
+}
+function findPreg(id) { return pregs().filter(function (p) { return p.ID === id; })[0]; }
+function newcomers() { return (S.data && S.data.newcomers) || []; }
+function patients() { return (S.data && S.data.patients) || []; }
+function findNew(id) { return newcomers().filter(function (p) { return p.ID === id; })[0]; }
+function findPat(id) { return patients().filter(function (p) { return p.ID === id; })[0]; }
+function eduCount(p) { return EDU.filter(function (k) { return p[k]; }).length; }
+function missions(gender) {
+  var n = gender === '남' ? 10 : (gender === '여' ? 15 : 0), out = [];
+  for (var i = 1; i <= n; i++) out.push(i + gender + '전도회');
+  return out;
+}
+function families() {
+  var map = {}, order = [];
+  newcomers().forEach(function (p) {
+    var f = p['가족ID'] || p.ID;
+    if (!map[f]) { map[f] = []; order.push(f); }
+    map[f].push(p);
+  });
+  return order.map(function (f) {
+    var ms = map[f];
+    var head = ms.filter(function (m) { return m['신앙세대주'] === 'Y'; })[0] || ms[0];
+    var others = ms.filter(function (m) { return m !== head; }).sort(function (a, b) { return (Number(a['연번']) || 0) - (Number(b['연번']) || 0); });
+    return { id: f, head: head, others: others, all: ms };
+  });
+}
+function famDone(f) { return f.all.every(function (p) { return !!p['완료일']; }); }
+function famYear(f) { return String(f.head['등록일'] || '').slice(0, 4); }
+function personReady(p) { return eduCount(p) === 4 && !!p['수료식'] && p['목장연결'] === 'Y'; }
+function famReady(f) { return f.all.every(personReady); }
+function newYears() {
+  var ys = {};
+  families().forEach(function (f) { var y = famYear(f); if (/^\d{4}$/.test(y)) ys[y] = 1; });
+  return Object.keys(ys).sort().reverse();
+}
+function scopeFams() {
+  return families().filter(function (f) {
+    return (S.tabNew === 'done') === famDone(f) && (S.yearNew === 'all' || famYear(f) === S.yearNew);
+  });
+}
+function familyOf(p) { return families().filter(function (f) { return f.all.indexOf(p) >= 0; })[0]; }
+
+/* ---------- 아이콘 ---------- */
+var I = {
+  back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  close: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  right: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
+  down: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  home: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6h-6v6H4z"/></svg>',
+  sprout: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20v-8M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 12c0-3 2.5-5 6-5 0 3.5-2.5 5-6 5z"/></svg>',
+  heart: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>',
+  care: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/><path d="M9.5 11.5h5M12 9v5"/></svg>',
+  lock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>',
+  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+  plus: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  cam: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  cal: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+  eye: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  upload: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>',
+  phone: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  baby: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7"/><path d="M12 6c0-1.7 1.3-3 3-3"/><path d="M9.5 15.2c.7.7 1.5 1 2.5 1s1.8-.3 2.5-1"/><path d="M9.5 11.5h.01M14.5 11.5h.01"/></svg>',
+  sil: function (w, h) { return '<svg class="sil" width="' + w + '" height="' + h + '" viewBox="0 0 80 92" fill="currentColor" aria-hidden="true"><circle cx="40" cy="34" r="18"/><path d="M6 92c0-20 15-34 34-34s34 14 34 34z"/></svg>'; }
+};
+
+/* ---------- 서버 호출 ---------- */
+function setBusy(d) { S.busy = Math.max(0, S.busy + d); document.getElementById('busy').className = S.busy ? 'show' : ''; }
+function call(fn, args, quiet) {
+  return new Promise(function (resolve, reject) {
+    if (!quiet) setBusy(1);
+    var r = google.script.run
+      .withSuccessHandler(function (v) { if (!quiet) setBusy(-1); resolve(v); })
+      .withFailureHandler(function (e) { if (!quiet) setBusy(-1); handleError(e, quiet); reject(e); });
+    r[fn].apply(r, args || []);
+  });
+}
+function handleError(e, quiet) {
+  var msg = (e && e.message) || String(e || '');
+  if (msg.indexOf('NEED_CODE') >= 0) {
+    S.token = null; S.roles = []; S.data = null; store('yb_token', null);
+    S.loginMsg = '코드 유효 시간이 지났어요. 다시 입력해 주세요.';
+    go('login');
+    return;
+  }
+  if (quiet) return;
+  if (msg.indexOf('NO_PERMISSION') >= 0) toast('이 코드로는 할 수 없는 일이에요.');
+  else toast(msg.replace(/^Error:\s*/, '') || '문제가 생겼어요. 잠시 뒤에 다시 해 주세요.');
+}
+var toastTimer;
+function toast(m) {
+  var t = document.getElementById('toast');
+  t.textContent = m; t.className = 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.className = ''; }, 2600);
+}
+function confirmBox(msg, okLabel) {
+  return new Promise(function (resolve) {
+    var m = document.createElement('div');
+    m.className = 'modal';
+    m.innerHTML = '<div class="box" role="dialog" aria-modal="true"><p>' + esc(msg) + '</p><div class="acts"><button type="button" class="btn line" data-r="0">취소</button><button type="button" class="btn" data-r="1">' + esc(okLabel || '확인') + '</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('[data-r="1"]').focus();
+    m.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-r]');
+      if (!b && e.target !== m) return;
+      document.body.removeChild(m);
+      resolve(!!(b && b.getAttribute('data-r') === '1'));
+    });
+  });
+}
+
+function loadData(quiet) {
+  return call('getData', [S.token], quiet).then(function (d) {
+    S.data = d; S.roles = d.roles || []; S.version = d.version; S.lastSync = new Date();
+    if (!S.dirty) S.draftKey = null;
+    return d;
+  });
+}
+
+/* ---------- 화면 전환 ---------- */
+function isForm() { return S.screen === 'newRegister' || S.screen === 'patDetail' || S.screen === 'pregDetail' || (S.screen === 'newDetail' && canEditNew()); }
+function go(screen, params) {
+  S.screen = screen; S.params = params || {}; S.draftKey = null; S.dirty = false; S.err = {};
+  render();
+  window.scrollTo(0, 0);
+}
+function leave(screen, params) {
+  if (S.dirty) {
+    confirmBox('저장하지 않은 내용이 있어요. 그래도 나갈까요?', '나가기').then(function (ok) { if (ok) go(screen, params); });
+  } else go(screen, params);
+}
+function render() {
+  var y = window.scrollY;
+  var f = R[S.screen] || R.loading;
+  app.innerHTML = f();
+  if (S.screen === 'newDetail' || S.screen === 'patDetail') loadFullPhoto();
+  return y;
+}
+function rerender() { var y = window.scrollY; render(); window.scrollTo(0, y); }
+
+function nav(active) {
+  function b(id, icon, label) {
+    return '<button type="button" data-act="nav" data-to="' + id + '" class="' + (active === id ? 'on' : '') + '"' + (active === id ? ' aria-current="page"' : '') + '>' + icon + label + '</button>';
+  }
+  return '<nav class="bottom" aria-label="메뉴"><div class="in">' + b('home', I.home, '홈') + b('newList', I.sprout, '새가족') + b('patList', I.heart, '환우') + b('pregList', I.baby, '임신') + '</div></nav>';
+}
+function footer() { return '<p class="footer">made by. Nevertheless_D</p>'; }
+
+/* ---------- 화면들 ---------- */
+var R = {};
+
+R.loading = function () {
+  return '<div class="empty" style="padding-top:40vh">불러오는 중…</div>';
+};
+
+R.login = function () {
+  var adding = !!S.token;
+  var pins = '';
+  var n = Math.max(4, S.code.length);
+  for (var i = 0; i < n; i++) pins += '<span class="' + (i < S.code.length ? 'on' : '') + '"></span>';
+  var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'].map(function (k) {
+    if (k === 'del') return '<button type="button" class="key" data-act="keyDel" aria-label="지우기">←</button>';
+    if (k === 'ok') return '<button type="button" class="key ok" data-act="keyOk">확인</button>';
+    return '<button type="button" class="key" data-act="key" data-k="' + k + '">' + k + '</button>';
+  }).join('');
+  return '' +
+    '<div class="top">' + (adding ? '<button type="button" class="ibtn" data-act="nav" data-to="home" aria-label="홈으로">' + I.back + '</button>' : '<span></span>') + '<span></span></div>' +
+    '<div class="pad" style="display:flex;flex-direction:column;align-items:center;gap:20px;padding-bottom:24px">' +
+      '<span class="home-card ico" style="width:64px;height:64px;padding:0;border:0;background:var(--green-bg);color:var(--green-text);align-items:center;justify-content:center;border-radius:20px">' + I.lock.replace('width="18" height="18"', 'width="30" height="30"') + '</span>' +
+      '<div style="text-align:center;display:flex;flex-direction:column;gap:6px">' +
+        '<span class="muted" style="font-size:13px">영복교회</span>' +
+        '<h1 class="serif" style="margin:0;font-size:28px">' + (adding ? '코드 추가' : '성도 돌봄') + '</h1>' +
+        '<p class="muted" style="margin:4px 0 0;font-size:14px;line-height:1.6">' + (adding ? '다른 코드를 입력하면 볼 수 있는 화면이 늘어나요.' : '받은 접속 코드를 입력해 주세요.<br>코드에 따라 볼 수 있는 화면이 정해져요.') + '</p>' +
+      '</div>' +
+      '<label class="sr" for="codeInput">접속 코드</label>' +
+      '<input id="codeInput" class="sr" type="password" inputmode="numeric" autocomplete="off" data-code="1" value="' + esc(S.code) + '">' +
+      '<div class="pin" aria-hidden="true">' + pins + '</div>' +
+      '<div class="err" role="alert">' + esc(S.loginMsg) + '</div>' +
+      '<div class="keys">' + keys + '</div>' +
+      '<p class="muted" style="margin:8px 0 0;font-size:12px;text-align:center;line-height:1.6">5번 틀리면 10분 동안 입력이 잠겨요.<br>입력한 코드는 이 기기에서 12시간 동안 유지돼요.</p>' +
+      footer() +
+    '</div>';
+};
+
+R.home = function () {
+  var d = S.data || {};
+  var parts = [];
+  var now = new Date();
+  var dateStr = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][now.getDay()] + '요일';
+  var sync = S.lastSync ? (Date.now() - S.lastSync.getTime() < 60000 ? '방금 동기화됨' : pad2(S.lastSync.getHours()) + ':' + pad2(S.lastSync.getMinutes()) + ' 동기화') : '';
+  var roleChips = [];
+  if (S.roles.indexOf('master') >= 0) roleChips.push('<span class="chip plain" style="background:var(--green);color:var(--on-green)">마스터</span>');
+  else if (canEditNew()) roleChips.push('<span class="chip green">새가족 수정</span>');
+  else if (canViewNew()) roleChips.push('<span class="chip gray">새가족 보기</span>');
+  if (canPat() && S.roles.indexOf('master') < 0) roleChips.push('<span class="chip rose">환우</span>');
+  parts.push('<div class="pad stack" style="padding-top:28px;gap:20px">');
+  parts.push('<div style="display:flex;flex-direction:column;gap:4px"><p class="muted" style="margin:0;font-size:13px">영복교회 · ' + dateStr + '</p>' +
+    '<h1 class="serif" style="margin:0;font-size:30px;letter-spacing:-.5px">성도 돌봄</h1>' +
+    '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px" class="muted"><span class="dot"></span><span id="syncLabel">' + esc(sync) + '</span></div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px">' + roleChips.join('') + '<button type="button" class="chip plain" data-act="nav" data-to="login">+ 코드 추가</button></div></div>');
+
+  if (canViewNew()) {
+    var allFams = families();
+    var fams = allFams.filter(function (f) { return !famDone(f); });
+    var doneFams = allFams.length - fams.length;
+    var list = [].concat.apply([], fams.map(function (f) { return f.all; }));
+    var inEdu = list.filter(function (p) { var c = eduCount(p); return c > 0 && c < 4; }).length;
+    var noFarm = list.filter(function (p) { return p['목장연결'] !== 'Y'; }).length;
+    parts.push('<button type="button" class="home-card" data-act="nav" data-to="newList">' +
+      '<span style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="display:flex;align-items:center;gap:12px"><span class="ico" style="background:var(--green-bg);color:var(--green-text)">' + I.sprout + '</span><span class="serif" style="font-size:21px">새가족</span></span><span class="muted">' + I.right + '</span></span>' +
+      '<span style="display:flex;align-items:baseline;gap:6px"><span class="big">' + list.length + '</span><span class="muted" style="font-size:15px">명 · ' + fams.length + '가정 진행 중</span></span>' +
+      '<span style="display:flex;gap:8px;flex-wrap:wrap">' + (canEditNew() ? '' : '<span class="chip gray">보기 전용</span>') + '<span class="chip green">교육 진행 중 ' + inEdu + '명</span><span class="chip amber">목장 미연결 ' + noFarm + '명</span>' + (doneFams ? '<span class="chip gray">전체 완료 ' + doneFams + '가정</span>' : '') + '</span>' +
+    '</button>');
+  } else {
+    parts.push(lockedCard('새가족', I.sprout, 'green', '새가족 코드를 입력해야 볼 수 있어요'));
+  }
+
+  if (canPat()) {
+    var ps = patients();
+    var inHosp = ps.filter(function (p) { return p['상황'] === '입원'; }).length;
+    var thisWeek = ps.filter(function (p) { var n = dayDiff(p['다음진료일']); return n !== null && n >= 0 && n <= 7; }).length;
+    parts.push('<button type="button" class="home-card" data-act="nav" data-to="patList">' +
+      '<span style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="display:flex;align-items:center;gap:12px"><span class="ico" style="background:var(--rose-bg);color:var(--rose-text)">' + I.care + '</span><span class="serif" style="font-size:21px">환우</span></span><span class="muted">' + I.right + '</span></span>' +
+      '<span style="display:flex;align-items:baseline;gap:6px"><span class="big">' + ps.length + '</span><span class="muted" style="font-size:15px">명</span></span>' +
+      '<span style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip rose">입원 중 ' + inHosp + '명</span><span class="chip gray">7일 안 진료 ' + thisWeek + '명</span></span>' +
+    '</button>');
+  } else {
+    parts.push(lockedCard('환우', I.care, 'rose', '마스터 코드를 입력해야 볼 수 있어요'));
+  }
+
+  if (canPreg()) {
+    var bs = pregs();
+    var soon = bs.filter(function (p) { var n = dayDiff(p['출산예정일']); return n !== null && n >= 0 && n <= 30; }).length;
+    parts.push('<button type="button" class="home-card" data-act="nav" data-to="pregList">' +
+      '<span style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="display:flex;align-items:center;gap:12px"><span class="ico" style="background:var(--pink-bg);color:var(--pink-text)">' + I.baby.replace(/22/g, '24') + '</span><span class="serif" style="font-size:21px">임신</span></span><span class="muted">' + I.right + '</span></span>' +
+      '<span style="display:flex;align-items:baseline;gap:6px"><span class="big">' + bs.length + '</span><span class="muted" style="font-size:15px">명</span></span>' +
+      '<span style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip pink">30일 안 출산 예정 ' + soon + '명</span><span class="chip gray">지금 조리원 ' + bs.filter(function (p) { return careState(p) === 'now'; }).length + '명</span></span>' +
+    '</button>');
+  } else {
+    parts.push(lockedCard('임신', I.baby.replace(/22/g, '24'), 'pink', '마스터 코드를 입력해야 볼 수 있어요'));
+  }
+
+  var logs = (d.log || []).slice(0, 6);
+  if (logs.length) {
+    parts.push('<div style="display:flex;flex-direction:column;gap:10px"><h2 class="muted" style="margin:0;font-size:14px;font-weight:500">최근 변경</h2><div class="log">' +
+      logs.map(function (l) { return '<div><span>' + esc(l['이름']) + ' ' + esc(l['내용']) + '</span><span class="muted" style="white-space:nowrap">' + esc(relTime(l['시간'])) + '</span></div>'; }).join('') +
+      '</div></div>');
+  }
+  parts.push('<div style="text-align:center"><button type="button" class="linkbtn" style="color:var(--sub)" data-act="logout">이 기기에서 나가기</button></div>');
+  parts.push(footer() + '</div>');
+  return parts.join('') + nav('home');
+};
+
+function lockedCard(title, icon, tone, text) {
+  var bg = 'var(--' + tone + '-bg)', fg = 'var(--' + tone + '-text)';
+  return '<button type="button" class="home-card" data-act="nav" data-to="login">' +
+    '<span style="display:flex;align-items:center;gap:12px"><span class="ico" style="background:' + bg + ';color:' + fg + '">' + icon + '</span><span class="serif" style="font-size:21px">' + title + '</span></span>' +
+    '<span style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--chip);color:var(--sub);font-size:14px">' + I.lock + '<span style="flex:1">' + text + '</span><span style="font-weight:500;color:' + fg + '">코드 입력</span></span>' +
+  '</button>';
+}
+
+/* 새가족 목록 */
+function famMatches(f) {
+  if ((S.tabNew === 'done') !== famDone(f)) return false;
+  if (S.yearNew !== 'all' && famYear(f) !== S.yearNew) return false;
+  var q = S.qNew.trim();
+  if (q && !f.all.some(function (p) { return (p['이름'] + ' ' + p['인도자']).indexOf(q) >= 0; })) return false;
+  if (S.filterNew === 'edu') return f.all.some(function (p) { var c = eduCount(p); return c < 4; });
+  if (S.filterNew === 'done') return f.all.some(function (p) { return eduCount(p) === 4; });
+  if (S.tabNew === 'done') return true;
+  if (S.filterNew === 'nofarm') return f.all.some(function (p) { return p['목장연결'] !== 'Y'; });
+  if (S.filterNew === 'ready') return famReady(f);
+  return true;
+}
+function newItems() {
+  var fams = families().filter(famMatches).sort(function (a, b) { return (Number(b.head['연번']) || 0) - (Number(a.head['연번']) || 0); });
+  if (!fams.length) {
+    if (!newcomers().length) return '<div class="empty">아직 등록된 새가족이 없어요.' + (canEditNew() ? '<br>오른쪽 아래 등록 버튼으로 시작해 보세요.' : '') + '</div>';
+    if (S.tabNew === 'done' && !scopeFams().length) return '<div class="empty">' + (S.yearNew === 'all' ? '' : S.yearNew + '년 등록 중에는 ') + '아직 전체 완료한 가정이 없어요.<br>교육 4강, 수료식, 목장 연결을 마치면 상세 화면에서 완료로 옮길 수 있어요.</div>';
+    return '<div class="empty">찾는 조건에 맞는 새가족이 없어요.</div>';
+  }
+  return fams.map(function (f) {
+    var p = f.head, open = !!S.openFam[f.id], isFam = f.others.length > 0;
+    var edu = EDU.map(function (k, i) { return '<span class="' + (p[k] ? 'done' : '') + '">' + (i + 1) + '</span>'; }).join('');
+    var linked = p['목장연결'] === 'Y' && p['목장'];
+    var thumb = p['사진썸네일'] ? '<img alt="" src="' + esc(p['사진썸네일']) + '">' : I.sil(40, 46);
+    var meta = [p['성별'], birthLabel(p['연생'])].filter(String).join(' · ');
+    var sub = [p['전도회'], p['인도자'] ? '인도자 ' + p['인도자'] : ''].filter(String).join(' · ');
+    var html = '<div class="item' + (open ? ' open' : '') + '">' +
+      '<button type="button" class="item-main" data-act="' + (isFam ? 'toggleFam' : 'openNew') + '" data-id="' + esc(isFam ? f.id : p.ID) + '"' + (isFam ? ' aria-expanded="' + open + '"' : '') + '>' +
+        '<span class="thumb">' + thumb + '<span class="no">' + esc(pad2(p['연번'])) + '</span></span>' +
+        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">' +
+          '<span class="row-between"><span style="font-size:16px;font-weight:700">' + esc(p['이름']) + ' <span class="muted" style="font-size:13px;font-weight:400">' + esc(meta) + '</span></span><span class="muted small" style="white-space:nowrap">' + esc(shortDate(p['등록일'])) + '</span></span>' +
+          (sub ? '<span class="muted small">' + esc(sub) + '</span>' : '') +
+          '<span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="edu" aria-label="새가족교육 ' + eduCount(p) + '강 완료">' + edu + '</span>' +
+            '<span class="chip ' + (linked ? 'green' : 'amber') + '" style="font-size:11px;padding:2px 8px">' + esc(linked ? p['목장'] : '목장 미연결') + '</span>' +
+            (p['수료식'] ? '<span class="chip green" style="font-size:11px;padding:2px 8px">수료식</span>' : '') +
+            (isFam ? '<span class="chip plain" style="font-size:11px;padding:2px 8px">가족 ' + f.all.length + '</span>' : '') +
+            (famDone(f) ? '<span class="chip plain" style="font-size:11px;padding:2px 8px;background:var(--green);color:var(--on-green)">완료 ' + esc(shortDate(p['완료일'])) + '</span>' : (famReady(f) ? '<span class="chip plain" style="font-size:11px;padding:2px 8px">완료 가능</span>' : '')) +
+          '</span>' +
+        '</span>' +
+        (isFam ? '<span class="muted" style="transform:' + (open ? 'rotate(180deg)' : 'none') + '">' + I.down + '</span>' : '') +
+      '</button>';
+    if (isFam && open) {
+      html += '<div class="members">' + f.others.map(function (m) {
+        return '<button type="button" data-act="openNew" data-id="' + esc(m.ID) + '"><span>' + esc(m['이름']) + ' <span class="muted small">' + esc([m['관계'], birthLabel(m['연생'])].filter(String).join(' · ')) + '</span></span><span class="muted">' + I.right + '</span></button>';
+      }).join('') + '<button type="button" class="linkbtn" data-act="openNew" data-id="' + esc(p.ID) + '">' + esc(p['이름']) + '님 상세 정보 보기</button></div>';
+    }
+    return html + '</div>';
+  }).join('');
+}
+
+R.newList = function () {
+  if (!canViewNew()) return R.needCode('새가족', '새가족 보기 코드나 수정 코드를 입력해 주세요.');
+  var fams = scopeFams();
+  var people = fams.reduce(function (n, f) { return n + f.all.length; }, 0);
+  var all = families(), doneN = all.filter(famDone).length;
+  var years = newYears();
+  var tabs = '<div class="tabs" role="tablist"><button type="button" role="tab" aria-selected="' + (S.tabNew === 'active') + '" class="' + (S.tabNew === 'active' ? 'on' : '') + '" data-act="tabNew" data-v="active">진행 중 ' + (all.length - doneN) + '</button><button type="button" role="tab" aria-selected="' + (S.tabNew === 'done') + '" class="' + (S.tabNew === 'done' ? 'on' : '') + '" data-act="tabNew" data-v="done">전체 완료 ' + doneN + '</button></div>';
+  var yearSel = '<select class="inp" style="width:auto;height:38px;padding:0 10px;font-size:14px;background:var(--surface)" aria-label="등록 연도" data-ch="year"><option value="all"' + (S.yearNew === 'all' ? ' selected' : '') + '>모든 연도</option>' + years.map(function (y) { return '<option value="' + y + '"' + (S.yearNew === y ? ' selected' : '') + '>' + y + '년 등록</option>'; }).join('') + '</select>';
+  var filters = [['all', '전체'], ['edu', '교육 중'], ['done', '수료'], ['nofarm', '목장 미연결'], ['ready', '완료 가능']].map(function (f) {
+    return '<button type="button" class="' + (S.filterNew === f[0] ? 'on' : '') + '" data-act="filterNew" data-v="' + f[0] + '">' + f[1] + '</button>';
+  }).join('');
+  return '<div class="pad stack" style="padding-top:20px;padding-bottom:12px;gap:12px">' +
+      '<div class="row-between" style="align-items:center"><div style="display:flex;align-items:baseline;gap:8px"><h1 class="serif" style="margin:0;font-size:26px">새가족</h1><span class="muted" style="font-size:14px">' + fams.length + '가정 · ' + people + '명</span></div>' +
+        (canEditNew() ? '<span style="display:flex;gap:6px;align-items:center"><button type="button" class="chip plain" data-act="openUpload">' + I.upload + '엑셀로 등록</button><span class="chip green">편집 가능</span></span>' : '<button type="button" class="chip gray" data-act="nav" data-to="login">' + I.lock.replace(/18/g, '14') + ' 보기 전용 · 코드 입력</button>') + '</div>' +
+      '<label class="search">' + I.search + '<input type="search" placeholder="이름, 인도자로 찾기" aria-label="새가족 검색" data-q="new" value="' + esc(S.qNew) + '"></label>' +
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' + tabs + yearSel + '</div>' +
+      (S.tabNew === 'active' ? '<div class="filters">' + filters + '</div>' : '') +
+    '</div>' +
+    '<div class="list" id="listArea">' + newItems() + '</div>' +
+    (canEditNew() && S.tabNew === 'active' ? '<button type="button" class="fab" data-act="newRegister">' + I.plus + '등록</button>' : '') +
+    nav('newList');
+};
+
+R.needCode = function (title, text) {
+  return '<div class="pad stack" style="padding-top:28px"><h1 class="serif" style="margin:0;font-size:26px">' + esc(title) + '</h1>' +
+    '<button type="button" class="lockbar" data-act="nav" data-to="login">' + I.lock + '<span style="flex:1">' + esc(text) + '</span><span style="font-weight:500;color:var(--green)">코드 입력</span></button></div>' + nav({ '환우': 'patList', '임신': 'pregList' }[title] || 'newList');
+};
+
+/* 새가족 상세 */
+function photoBlock(kind, p, w, h, editable) {
+  var src = (S.photo[kind + p.ID] && S.photo[kind + p.ID].src) || p['사진썸네일'];
+  return '<div class="photo' + (kind === 'patient' ? ' rose' : '') + '" style="width:' + w + 'px;height:' + h + 'px">' +
+    '<div class="frame" role="img" aria-label="' + esc(p['이름'] || '') + ' 사진">' + (src ? '<img id="photoImg" alt="" src="' + esc(src) + '">' : I.sil(Math.round(w * .82), Math.round(h * .8))) + '</div>' +
+    (editable ? '<label class="cam" aria-label="사진 바꾸기">' + I.cam + '<input class="hide-file" type="file" accept="image/*" data-ch="photo" data-kind="' + kind + '"></label>' : '') +
+  '</div>';
+}
+
+function loadFullPhoto() {
+  var kind = S.screen === 'patDetail' ? 'patient' : 'new';
+  var id = S.params.id;
+  var p = kind === 'patient' ? findPat(id) : findNew(id);
+  if (!p || !p.hasPhoto) return;
+  var key = kind + id, stamp = p['수정일시'] + p['사진썸네일'].length;
+  if (S.photo[key] && S.photo[key].stamp === stamp) return;
+  S.photo[key] = { stamp: stamp, src: null };
+  call('getPhoto', [S.token, kind, id], true).then(function (src) {
+    if (!src) return;
+    S.photo[key] = { stamp: stamp, src: src };
+    var img = document.getElementById('photoImg');
+    if (img && S.params.id === id) img.src = src;
+  }).catch(function () {});
+}
+
+function infoRow(label, value, cls) {
+  return '<div class="info-row"><span class="muted">' + esc(label) + '</span><span' + (cls ? ' style="color:var(--green-text)"' : '') + '>' + (value ? esc(value) : '<span class="muted" style="font-weight:400">—</span>') + '</span></div>';
+}
+
+R.newDetail = function () {
+  var p = findNew(S.params.id);
+  if (!p) return '<div class="top"><button type="button" class="ibtn" data-act="nav" data-to="newList" aria-label="목록으로">' + I.back + '</button></div><div class="empty">이 사람을 찾을 수 없어요. 지워졌을 수 있어요.</div>';
+  return canEditNew() ? newEdit(p) : newView(p);
+};
+
+function familyListHtml(p, clickable) {
+  var f = familyOf(p);
+  if (!f) return '';
+  var all = [f.head].concat(f.others);
+  return all.map(function (m, i) {
+    var head = m === f.head;
+    var label = [head ? '신앙세대주' : m['관계'], birthLabel(m['연생'])].filter(String).join(' · ');
+    var inner = '<span style="width:40px;height:40px;border-radius:12px;flex-shrink:0;background:' + (head ? 'var(--green)' : 'var(--chip)') + ';color:' + (head ? 'var(--on-green)' : 'var(--sub)') + ';font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">' + esc(String(m['이름'] || '?').charAt(0)) + '</span>' +
+      '<span style="flex:1;display:flex;flex-direction:column;gap:1px;text-align:left"><span style="font-size:15px;font-weight:500">' + esc(m['이름']) + (m.ID === p.ID ? ' <span class="muted small" style="font-weight:400">(지금 보는 사람)</span>' : '') + '</span><span class="small" style="color:' + (head ? 'var(--green-text)' : 'var(--sub)') + '">' + esc(label) + '</span></span>';
+    var style = 'min-height:56px;display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;padding:0;' + (i ? 'border-top:1px solid var(--line);' : '');
+    return (clickable && m.ID !== p.ID) ? '<button type="button" style="' + style + '" data-act="openNew" data-id="' + esc(m.ID) + '">' + inner + '<span class="muted">' + I.right + '</span></button>' : '<div style="' + style + '">' + inner + '</div>';
+  }).join('');
+}
+
+function newView(p) {
+  var f = familyOf(p);
+  var edu = EDU.map(function (k) {
+    var done = !!p[k];
+    return '<span style="height:56px;border-radius:12px;background:' + (done ? 'var(--green-bg)' : 'var(--chip)') + ';color:' + (done ? 'var(--green-text)' : 'var(--sub)') + ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:14px;font-weight:700">' + k + '<span style="font-size:11px;font-weight:400">' + (done ? shortDate(p[k]) + ' 완료' : '예정') + '</span></span>';
+  }).join('');
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="newList" aria-label="목록으로">' + I.back + '</button><span class="title">새가족 정보</span><span style="width:44px"></span></div>' +
+    '<div class="pad stack narrow" style="padding-bottom:20px">' +
+      '<div style="display:flex;align-items:center;gap:16px;padding:4px 0 6px">' + photoBlock('new', p, 88, 106, false) +
+        '<div style="display:flex;flex-direction:column;gap:6px"><span class="small" style="font-weight:700;color:var(--green)">연번 ' + esc(pad2(p['연번'])) + '</span>' +
+        '<span class="serif" style="font-size:28px">' + esc(p['이름']) + '</span>' +
+        '<span class="muted" style="font-size:13px">' + esc([p['성별'], birthLabel(p['연생']), p['신급'] && p['신급'] !== '없음' ? p['신급'] : ''].filter(String).join(' · ')) + '</span>' +
+        '<span style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip gray">' + I.eye + '보기 전용</span>' + (p['완료일'] ? '<span class="chip plain" style="background:var(--green);color:var(--on-green)">전체 완료 ' + esc(shortDate(p['완료일'])) + '</span>' : '') + '</span></div></div>' +
+      '<section class="card" style="padding:6px 18px">' +
+        infoRow('등록일', fmtDate(p['등록일'])) + infoRow('인도자', p['인도자']) +
+        infoRow('등록심방', p['등록심방'] ? shortDate(p['등록심방']) + ' 완료' : '', !!p['등록심방']) +
+        infoRow('신급', p['신급']) + infoRow('전도회', p['전도회']) +
+        infoRow('목장', p['목장연결'] === 'Y' ? p['목장'] : '미연결', p['목장연결'] === 'Y') +
+      '</section>' +
+      '<section class="card sec"><div class="row-between"><h2>새가족교육</h2><span style="font-size:13px;font-weight:500;color:var(--green)">' + eduCount(p) + ' / 4강</span></div><div class="grid4">' + edu + '</div>' +
+        '<div class="check-row" style="min-height:32px">수료식<span style="font-size:14px;font-weight:500;color:' + (p['수료식'] ? 'var(--green-text)' : 'var(--sub)') + '">' + (p['수료식'] ? esc(shortDate(p['수료식'])) + ' 참석' : '아직') + '</span></div></section>' +
+      (f && f.all.length > 1 ? '<section class="card" style="padding:12px 18px"><h2 style="margin:4px 0;font-size:15px">가족</h2>' + familyListHtml(p, true) + '</section>' : '') +
+      '<button type="button" class="lockbar" data-act="nav" data-to="login">' + I.lock + '<span style="flex:1">입력과 수정은 코드를 입력하면 돼요</span><span style="font-weight:500;color:var(--green)">코드 입력</span></button>' +
+      footer() +
+    '</div>';
+}
+
+function seg(path, options, value, cols, ch) {
+  return '<div class="seg" style="display:grid;grid-template-columns:repeat(' + (cols || options.length) + ',minmax(0,1fr));gap:8px">' + options.map(function (o) {
+    var v = Array.isArray(o) ? o[0] : o, l = Array.isArray(o) ? o[1] : o;
+    return '<label class="' + (value === v ? 'on' : '') + '"><input type="radio" name="' + esc(path) + '" value="' + esc(v) + '" data-ch="' + (ch || 'set') + '" data-f="' + esc(path) + '"' + (value === v ? ' checked' : '') + '>' + esc(l) + '</label>';
+  }).join('') + '</div>';
+}
+function inputField(label, path, value, attrs) {
+  var extra = /type="date"/.test(attrs || '') ? ' data-ph="2027. 01. 01" data-empty="' + (value ? '0' : '1') + '"' : '';
+  return '<label class="field">' + esc(label) + '<input ' + (attrs || 'type="text"') + extra + ' data-f="' + esc(path) + '" value="' + esc(value) + '"></label>';
+}
+function selectField(label, path, options, value, emptyLabel, ch) {
+  var has = options.indexOf(value) >= 0;
+  return '<label class="field">' + esc(label) + '<select data-ch="' + (ch || 'set') + '" data-f="' + esc(path) + '">' +
+    '<option value="">' + esc(emptyLabel || '선택') + '</option>' +
+    (value && !has ? '<option value="' + esc(value) + '" selected>' + esc(value) + '</option>' : '') +
+    options.map(function (o) { return '<option value="' + esc(o) + '"' + (o === value ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') +
+  '</select></label>';
+}
+
+function newEdit(p) {
+  if (S.draftKey !== 'new:' + p.ID) { S.draft = clone(p); S.draftKey = 'new:' + p.ID; S.dirty = false; }
+  var d = S.draft, f = familyOf(p), farms = (S.data && S.data.farms) || [];
+  var edu = EDU.map(function (k) {
+    var done = !!d[k];
+    return '<label class="edu-box' + (done ? ' done' : '') + '"><input type="checkbox" data-ch="edu" data-k="' + k + '"' + (done ? ' checked' : '') + '><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">' + k + '</span><span class="small" style="color:var(--sub)">' + (done ? shortDate(d[k]) + ' 수강' : '미수강') + '</span></span></label>';
+  }).join('');
+  var isHead = p['신앙세대주'] === 'Y';
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="newList" aria-label="목록으로">' + I.back + '</button><span class="title">새가족 정보</span><button type="button" class="btn" data-act="saveNew">저장</button></div>' +
+    '<div class="pad stack narrow" style="padding-bottom:24px">' +
+      '<div style="display:flex;align-items:center;gap:16px;padding:4px 0 8px">' + photoBlock('new', p, 96, 116, true) +
+        '<div style="display:flex;flex-direction:column;gap:4px"><span class="small" style="font-weight:700;color:var(--green)">연번 ' + esc(pad2(p['연번'])) + '</span>' +
+        '<span class="serif" style="font-size:26px">' + esc(p['이름']) + '</span><span class="muted" style="font-size:13px">' + esc(fmtDate(p['등록일'])) + ' 등록</span>' +
+        (isHead ? '<span class="chip green" style="align-self:flex-start;margin-top:4px">신앙세대주' + (f && f.all.length > 1 ? ' · 가족 ' + f.all.length + '명' : '') + '</span>' : '') + '</div></div>' +
+
+      '<section class="card sec" style="gap:4px"><div class="row-between" style="padding-bottom:6px"><h2>가족</h2><span class="muted small">' + (f && f.all.length > 1 ? '가족 ' + f.all.length + '명' : '개인 등록') + '</span></div>' +
+        familyListHtml(p, true) +
+        '<button type="button" class="addbtn" style="margin-top:8px;min-height:44px;font-size:14px" data-act="addFamily" data-id="' + esc(f ? f.id : p['가족ID']) + '">' + I.plus + '가족 구성원 추가</button></section>' +
+
+      '<section class="card sec"><h2>기본 정보</h2>' +
+        inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') +
+        '<div class="field">성별' + seg('성별', ['남', '여'], d['성별'], 2, 'gender') + '</div>' +
+        '<div class="grid2">' + inputField('연생 (예: 1978)', '연생', d['연생'], 'type="text" inputmode="numeric" maxlength="4"') + inputField('등록일', '등록일', d['등록일'], 'type="date"') + '</div>' +
+        inputField('인도자', '인도자', d['인도자'], 'type="text" maxlength="40"') +
+        '<div class="grid2">' + selectField('관계', '관계', RELATIONS, d['관계'], '선택') +
+          '<div class="field">신앙세대주<label class="check-row" style="border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;color:var(--text)">' + (isHead ? '지금 신앙세대주예요' : '신앙세대주로 지정') +
+          '<input type="checkbox" data-ch="head1"' + (d['신앙세대주'] === 'Y' ? ' checked' : '') + (isHead ? ' disabled' : '') + '></label></div></div>' +
+        '<div class="check-row">사진촬영<span class="small" style="color:' + (p.hasPhoto ? 'var(--green-text)' : 'var(--sub)') + '">' + (p.hasPhoto ? '사진 등록됨' : '사진 없음 · 위 카메라 버튼으로 올려요') + '</span></div>' +
+      '</section>' +
+
+      '<section class="card sec" style="gap:12px"><div class="row-between"><h2>새가족교육</h2><span style="font-size:13px;font-weight:500;color:var(--green)">' + eduCount(d) + ' / 4강</span></div><div class="grid2" style="gap:8px">' + edu + '</div>' +
+        '<label class="edu-box' + (d['수료식'] ? ' done' : '') + '" style="justify-content:space-between"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">수료식</span><span class="small" style="color:var(--sub)">' + (d['수료식'] ? shortDate(d['수료식']) + ' 참석' : '아직') + '</span></span><input type="checkbox" data-ch="ceremony"' + (d['수료식'] ? ' checked' : '') + '></label>' +
+        (d['수료식'] ? inputField('수료식 날짜', '수료식', d['수료식'], 'type="date"') : '') +
+      '</section>' +
+
+      '<section class="card sec"><h2>심방 · 소속</h2>' +
+        '<label class="check-row">등록심방<span style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green-text)">' + (d['등록심방'] ? '완료' : '') + '<input type="checkbox" data-ch="visit"' + (d['등록심방'] ? ' checked' : '') + '></span></label>' +
+        (d['등록심방'] ? inputField('심방 날짜', '등록심방', d['등록심방'], 'type="date"') : '') +
+        (d['성별'] ? selectField('전도회', '전도회', missions(d['성별']), d['전도회'], '선택') + '<span class="muted" style="font-size:11px;margin-top:-8px">성별에 맞춰 ' + (d['성별'] === '남' ? '남전도회 1~10' : '여전도회 1~15') + '이 나와요</span>' : '<div class="field">전도회<span class="small" style="color:var(--sub)">성별을 먼저 골라 주세요</span></div>') +
+        '<div class="field">목장' + seg('목장연결', [['Y', '연결됨'], ['N', '미연결']], d['목장연결'] === 'Y' ? 'Y' : 'N', 2, 'farm') + '</div>' +
+        (d['목장연결'] === 'Y' ? '<input class="inp" type="text" list="farmList" maxlength="40" placeholder="목장 이름" aria-label="연결된 목장 이름" data-f="목장" value="' + esc(d['목장']) + '"><datalist id="farmList">' + farms.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' : '') +
+      '</section>' +
+
+      '<section class="card sec"><h2>신급</h2>' + seg('신급', GRADES, d['신급'], 4) + '</section>' +
+      completeBlock(p) +
+
+      '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
+      '<button type="button" class="btn wide" data-act="saveNew">저장</button>' +
+      '<p class="muted small" style="text-align:center;margin:0">마지막 수정 · ' + esc(p['수정일시'] || '—') + '</p>' +
+      '<button type="button" class="btn danger" data-act="delNew">명단에서 삭제</button>' +
+      footer() +
+    '</div>';
+}
+
+function completeBlock(p) {
+  var f = familyOf(p);
+  if (!f) return '';
+  var many = f.all.length > 1;
+  if (famDone(f)) {
+    return '<section class="card sec"><h2>전체 완료</h2><p class="notice">' + esc(fmtDate(p['완료일'])) + '에 전체 완료했어요. 새가족 목록의 "전체 완료"에서 볼 수 있어요.</p>' +
+      '<button type="button" class="btn line" data-act="completeFam" data-id="' + esc(f.id) + '" data-done="0">진행 중으로 되돌리기</button></section>';
+  }
+  var rows = [
+    ['새가족교육 4강', f.all.every(function (m) { return eduCount(m) === 4; })],
+    ['수료식', f.all.every(function (m) { return !!m['수료식']; })],
+    ['목장 연결', f.all.every(function (m) { return m['목장연결'] === 'Y'; })]
+  ];
+  var ready = rows.every(function (r) { return r[1]; });
+  return '<section class="card sec" style="gap:12px"><h2>전체 완료</h2>' +
+    '<p class="muted" style="margin:0;font-size:13px;line-height:1.6">모두 마치면 진행 중 목록에서 빠지고 "전체 완료" 명단으로 옮겨져요. 지워지지 않아요.' + (many ? ' 가족 ' + f.all.length + '명이 함께 옮겨져요.' : '') + '</p>' +
+    rows.map(function (r) {
+      return '<div class="check-line"><span class="mk" style="background:' + (r[1] ? 'var(--green)' : 'var(--chip)') + ';color:' + (r[1] ? 'var(--on-green)' : 'var(--sub)') + '" aria-hidden="true">' + (r[1] ? '✓' : '') + '</span><span>' + r[0] + (many ? ' <span class="muted small">(가족 모두)</span>' : '') + '</span><span class="sr">' + (r[1] ? '완료' : '아직') + '</span></div>';
+    }).join('') +
+    '<button type="button" class="btn ' + (ready ? '' : 'line') + '" style="min-height:46px" data-act="completeFam" data-id="' + esc(f.id) + '" data-done="1">' + (many ? '가족 전체 완료로 옮기기' : '전체 완료로 옮기기') + '</button></section>';
+}
+
+/* 엑셀로 한 번에 등록 */
+var BULK_COLS = ['가족번호', '신앙세대주', '관계', '이름', '성별', '연생', '등록일', '인도자', '전도회', '목장', '신급', '1강', '2강', '3강', '4강', '등록심방', '수료식'];
+var COL_ALIASES = {
+  '이름': ['이름', '성명', '성함', '이름(필수)'], '성별': ['성별'], '연생': ['연생', '생년', '출생연도', '출생년도', '생년월일', '년생'],
+  '등록일': ['등록일', '등록일자', '등록날짜'], '인도자': ['인도자', '전도자'], '전도회': ['전도회'], '목장': ['목장', '목장명', '소속목장'],
+  '신급': ['신급'], '가족번호': ['가족번호', '가정번호', '가족', '가정'], '신앙세대주': ['신앙세대주', '세대주'], '관계': ['관계', '가족관계'],
+  '등록심방': ['등록심방', '심방'], '수료식': ['수료식', '수료']
+};
+function canonCol(h) {
+  var x = String(h || '').replace(/[\s*]/g, '');
+  var m = /^(새가족)?(교육)?([1-4])강/.exec(x);
+  if (m) return m[3] + '강';
+  for (var k in COL_ALIASES) if (COL_ALIASES[k].indexOf(x) >= 0) return k;
+  return '';
+}
+function ymd(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+var xlsxLoading = null;
+function loadXlsx() {
+  if (window.XLSX) return Promise.resolve();
+  if (xlsxLoading) return xlsxLoading;
+  xlsxLoading = new Promise(function (resolve, reject) {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = function () { resolve(); };
+    s.onerror = function () { xlsxLoading = null; reject(new Error('엑셀 읽기 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.')); };
+    document.head.appendChild(s);
+  });
+  return xlsxLoading;
+}
+function parseSheetFile(file) {
+  return loadXlsx().then(function () {
+    return file.arrayBuffer();
+  }).then(function (buf) {
+    var wb = XLSX.read(buf, { type: 'array', cellNF: true });
+    var name = wb.SheetNames.indexOf('일괄입력') >= 0 ? '일괄입력' : wb.SheetNames[0];
+    var ws = wb.Sheets[name], aoa = [];
+    if (ws['!ref']) {
+      var rg = XLSX.utils.decode_range(ws['!ref']);
+      for (var rr = rg.s.r; rr <= rg.e.r; rr++) {
+        var line = [];
+        for (var cc = rg.s.c; cc <= rg.e.c; cc++) {
+          var cell = ws[XLSX.utils.encode_cell({ r: rr, c: cc })], v = '';
+          if (cell) {
+            if (cell.t === 'n' && cell.z && XLSX.SSF.is_date(cell.z)) {
+              var dc = XLSX.SSF.parse_date_code(cell.v);
+              v = dc ? dc.y + '-' + pad2(dc.m) + '-' + pad2(dc.d) : cell.v;
+            } else if (cell.t === 'd') v = ymd(cell.v);
+            else v = cell.v;
+          }
+          line.push(v);
+        }
+        aoa.push(line);
+      }
+    }
+    var hi = -1, map = [];
+    for (var i = 0; i < Math.min(aoa.length, 10); i++) {
+      var cand = aoa[i].map(canonCol);
+      if (cand.indexOf('이름') >= 0) { hi = i; map = cand; break; }
+    }
+    if (hi < 0) throw new Error('첫 줄에 "이름"(또는 성명) 칸이 있는 표를 찾지 못했어요.');
+    var rows = [];
+    for (var r = hi + 1; r < aoa.length; r++) {
+      var o = { _row: r + 1 }, any = false;
+      map.forEach(function (k, c) {
+        if (!k) return;
+        var v = aoa[r][c];
+        if (v instanceof Date) v = ymd(v);
+        v = String(v === null || v === undefined ? '' : v).trim();
+        if (v) { o[k] = v; any = true; }
+      });
+      if (any) rows.push(o);
+    }
+    var used = {};
+    map.forEach(function (k) { if (k) used[k] = 1; });
+    return { rows: rows, cols: BULK_COLS.filter(function (k) { return used[k]; }), sheet: name };
+  });
+}
+
+R.newUpload = function () {
+  if (!canEditNew()) return R.needCode('새가족', '새가족 수정 코드를 입력해야 등록할 수 있어요.');
+  var U = S.upload || (S.upload = { status: 'idle' });
+  var body = '';
+  if (U.status === 'reading' || U.status === 'checking' || U.status === 'saving') {
+    body = '<div class="empty">' + { reading: '파일을 읽는 중…', checking: '한 줄씩 확인하는 중…', saving: '등록하는 중…' }[U.status] + '</div>';
+  } else if (U.status === 'ready') {
+    var res = U.result;
+    body = '<section class="card sec"><div class="row-between"><h2>' + esc(U.fileName) + '</h2><span class="muted small">' + U.rows.length + '줄 읽음</span></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">' + U.cols.map(function (c) { return '<span class="chip gray">' + esc(c) + '</span>'; }).join('') + '</div>' +
+      '<p class="muted small" style="margin:0">위 칸들을 알아봤어요. 다른 제목의 칸은 넣지 않아요.</p></section>' +
+      '<section class="card sec" style="gap:10px"><h2>확인 결과</h2>' +
+        '<div class="check-line"><span class="mk" style="background:var(--green);color:var(--on-green)" aria-hidden="true">✓</span><span><b style="font-weight:700">' + res.people + '명 (' + res.families + '가정)</b> 등록할 수 있어요</span></div>' +
+        (res.errors.length ? '<div class="check-line"><span class="mk" style="background:var(--rose-bg);color:var(--rose-text)" aria-hidden="true">!</span><span><b style="font-weight:700">' + res.errors.length + '줄</b>은 아래 이유로 빼고 등록해요</span></div>' +
+          '<div style="display:flex;flex-direction:column;border-radius:12px;border:1px solid var(--line);overflow:hidden">' + res.errors.slice(0, 60).map(function (e) {
+            return '<div style="padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5"><b style="font-weight:500">' + e.row + '번째 줄' + (e.name ? ' · ' + esc(e.name) : '') + '</b><br><span style="color:var(--rose-text)">' + esc(e.msg) + '</span></div>';
+          }).join('') + '</div>' + (res.errors.length > 60 ? '<p class="muted small" style="margin:0">… 그 외 ' + (res.errors.length - 60) + '줄</p>' : '') : '') +
+      '</section>' +
+      (res.people ? '<button type="button" class="btn wide" data-act="uploadCommit">' + res.people + '명 등록하기</button>' : '<p class="notice" style="background:var(--rose-bg);color:var(--rose-text)">등록할 수 있는 줄이 없어요. 파일을 고친 뒤 다시 골라 주세요.</p>') +
+      '<label class="btn line wide" style="display:flex;align-items:center;justify-content:center;cursor:pointer">다른 파일 고르기<input class="hide-file" type="file" accept=".xlsx,.xls,.csv" data-ch="uploadFile"></label>';
+  } else {
+    body = '<section class="card sec"><h2>파일 고르기</h2>' +
+        '<p class="muted" style="margin:0;font-size:14px;line-height:1.7">엑셀(.xlsx) 또는 CSV 파일을 골라 주세요. 고르면 바로 저장하지 않고, 먼저 한 줄씩 확인해서 보여줘요.</p>' +
+        (U.err ? '<p class="err" role="alert" style="margin:0">' + esc(U.err) + '</p>' : '') +
+        '<label class="btn wide" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">' + I.upload.replace(/15/g, '18') + '파일 고르기<input class="hide-file" type="file" accept=".xlsx,.xls,.csv" data-ch="uploadFile"></label>' +
+      '</section>' +
+      '<section class="card sec" style="gap:10px"><h2>파일 만드는 법</h2>' +
+        '<p class="muted" style="margin:0;font-size:13px;line-height:1.7">관리자에게 받은 "새가족_일괄입력_양식.xlsx"을 쓰면 가장 편해요. 다른 엑셀 파일도 첫 줄 제목이 아래와 같으면 알아서 맞춰요.</p>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' + ['이름 (또는 성명) · 꼭 필요', '성별', '연생 (또는 생년월일)', '등록일', '인도자', '전도회', '목장', '신급', '가족번호', '신앙세대주', '관계', '1강~4강', '등록심방', '수료식'].map(function (c) { return '<span class="chip gray">' + c + '</span>'; }).join('') + '</div>' +
+        '<ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)"><li>같은 가족은 가족번호에 같은 숫자, 신앙세대주 한 명에게 O</li><li>교육·심방·수료식은 마쳤으면 O 또는 날짜</li><li>전도회는 4여전도회 또는 숫자 4만</li><li>이미 명단에 있는 사람(이름·연생 같음)은 건너뛰어요</li></ul>' +
+      '</section>';
+  }
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="newList" aria-label="목록으로">' + I.back + '</button><span class="title">엑셀로 한 번에 등록</span><span style="width:44px"></span></div>' +
+    '<div class="pad stack narrow" style="padding-bottom:28px">' + body + footer() + '</div>';
+};
+
+/* 새가족 등록 */
+function blankMember(head) { return { '이름': '', '관계': head ? '본인' : '', '성별': '', '연생': '', '신앙세대주': head ? 'Y' : 'N', photo: null }; }
+
+R.newRegister = function () {
+  if (!canEditNew()) return R.needCode('새가족', '새가족 수정 코드를 입력해야 등록할 수 있어요.');
+  var famId = S.params.familyId || '';
+  var famHead = null;
+  if (famId) { var f = families().filter(function (x) { return x.id === famId; })[0]; famHead = f && f.head; }
+  if (S.draftKey !== 'reg:' + famId) {
+    S.draft = { mode: famId ? 'family' : 'single', common: { '등록일': today(), '인도자': famHead ? famHead['인도자'] : '' }, members: [blankMember(!famId)] };
+    S.draftKey = 'reg:' + famId; S.dirty = false;
+  }
+  var d = S.draft, family = d.mode === 'family';
+  var cards = d.members.map(function (m, i) {
+    var photo = m.photo ? '<img alt="" src="' + esc(m.photo.thumb) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">' : I.cam + '사진';
+    return '<section class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px;' + (family && !famId && m['신앙세대주'] === 'Y' ? 'border:2px solid var(--green)' : '') + '">' +
+      (d.members.length > 1 ? '<div class="row-between" style="align-items:center"><span class="small muted">' + (i + 1) + '번째</span><button type="button" class="linkbtn" style="color:var(--sub)" data-act="removeMember" data-i="' + i + '">빼기</button></div>' : '') +
+      '<div style="display:flex;gap:12px;align-items:flex-start">' +
+        '<label style="width:64px;height:76px;flex-shrink:0;border-radius:14px;border:1.5px dashed var(--line);background:var(--bg);color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;cursor:pointer;overflow:hidden" aria-label="사진 추가">' + photo + '<input class="hide-file" type="file" accept="image/*" data-ch="regPhoto" data-i="' + i + '"></label>' +
+        '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">' +
+          '<input class="inp" type="text" maxlength="40" placeholder="이름" aria-label="' + (i + 1) + '번째 이름" data-f="members.' + i + '.이름" value="' + esc(m['이름']) + '">' +
+          '<div class="grid2" style="gap:8px">' +
+            '<select class="inp" style="height:40px;font-size:14px" aria-label="관계" data-ch="set" data-f="members.' + i + '.관계"><option value="">관계</option>' + RELATIONS.map(function (r) { return '<option' + (r === m['관계'] ? ' selected' : '') + '>' + r + '</option>'; }).join('') + '</select>' +
+            '<input class="inp" style="height:40px;font-size:14px" type="text" inputmode="numeric" maxlength="4" placeholder="연생 (1982)" aria-label="연생" data-f="members.' + i + '.연생" value="' + esc(m['연생']) + '">' +
+          '</div></div></div>' +
+      '<div class="row-between" style="align-items:center">' + '<div style="flex:1;max-width:200px">' + seg('members.' + i + '.성별', ['남', '여'], m['성별'], 2) + '</div>' +
+        (family && !famId ? '<label class="chip ' + (m['신앙세대주'] === 'Y' ? 'green' : 'gray') + '" style="min-height:40px;padding:0 12px;font-size:13px;font-weight:500;cursor:pointer"><input type="radio" name="head" data-ch="regHead" data-i="' + i + '"' + (m['신앙세대주'] === 'Y' ? ' checked' : '') + ' style="width:18px;height:18px">신앙세대주</label>' : '') +
+      '</div>' +
+    '</section>';
+  }).join('');
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="newList" aria-label="닫기">' + I.close + '</button><span class="title">' + (famId ? '가족 구성원 추가' : '새가족 등록') + '</span><button type="button" class="btn" data-act="saveReg">저장</button></div>' +
+    '<div class="pad stack narrow" style="gap:16px;padding-bottom:28px">' +
+      (famId ? '' : '<button type="button" class="lockbar" style="background:var(--green-bg);color:var(--green-text)" data-act="openUpload">' + I.upload + '<span style="flex:1">여러 명은 엑셀 파일로 한 번에 등록할 수 있어요</span><span style="font-weight:500">엑셀로 등록</span></button>') +
+      (famId ? '<p class="notice">' + esc(famHead ? famHead['이름'] : '') + ' 가정에 새 가족을 더해요.</p>' :
+        '<fieldset style="margin:0;padding:0;border:0"><legend class="muted" style="padding:0 0 8px;font-size:13px">등록 방식</legend>' + seg('mode', [['single', '개인'], ['family', '가족 단위']], d.mode, 2, 'mode') + '</fieldset>') +
+      '<div class="grid2">' + inputField('등록일', 'common.등록일', d.common['등록일'], 'type="date"') + inputField('인도자', 'common.인도자', d.common['인도자'], 'type="text" maxlength="40" placeholder="인도자 이름"') + '</div>' +
+      (family ? '<div class="row-between" style="padding-top:4px"><h2 style="margin:0;font-size:15px">가족 구성원 <span style="color:var(--green)">' + d.members.length + '</span></h2>' + (famId ? '' : '<span class="muted small">신앙세대주 1명을 골라 주세요</span>') + '</div>' : '') +
+      cards +
+      (family ? '<button type="button" class="addbtn" data-act="addMember">' + I.plus + '가족 구성원 추가</button>' : '') +
+      '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
+      '<p class="notice">' + (family && !famId ? '목록에는 신앙세대주만 보이고, 누르면 가족이 아래로 펼쳐져요. ' : '') + '교육, 전도회, 목장, 신급은 저장한 뒤 한 사람씩 입력해요.</p>' +
+      '<button type="button" class="btn wide" data-act="saveReg">저장</button>' +
+    '</div>';
+};
+
+/* 환우 목록 */
+function patMatches(p) {
+  var q = S.qPat.trim();
+  if (q && (p['이름'] + ' ' + p['병원'] + ' ' + p['병명']).indexOf(q) < 0) return false;
+  if (S.filterPat === 'hosp') return p['상황'] === '입원';
+  if (S.filterPat === 'out') return p['상황'] === '통원치료';
+  if (S.filterPat === 'soon') return dayDiff(p['다음진료일']) !== null;
+  return true;
+}
+function statusChip(s) {
+  var tone = { '입원': 'rose', '통원치료': 'amber', '재활': 'green', '가료': 'green', '정기검진': 'gray', '요양': 'gray' }[s] || 'gray';
+  return s ? '<span class="chip ' + tone + '" style="font-weight:500">' + esc(s) + '</span>' : '';
+}
+function patItems() {
+  var list = patients().filter(patMatches);
+  if (S.filterPat === 'soon') list.sort(function (a, b) { return dayDiff(a['다음진료일']) - dayDiff(b['다음진료일']); });
+  else if (S.filterPat === 'call') list.sort(function (a, b) { var x = dayDiff(a['최근통화']), y = dayDiff(b['최근통화']); if (x === null) return -1; if (y === null) return 1; return x - y; });
+  else list.sort(function (a, b) { return String(b['수정일시']).localeCompare(String(a['수정일시'])); });
+  if (!list.length) return '<div class="empty">' + (patients().length ? '찾는 조건에 맞는 환우가 없어요.' : '아직 등록된 환우가 없어요.<br>오른쪽 아래 등록 버튼으로 시작해 보세요.') + '</div>';
+  return list.map(function (p) {
+    var n = dayDiff(p['다음진료일']);
+    var thumb = p['사진썸네일'] ? '<span class="thumb" style="width:44px;height:52px;background:var(--rose-bg);color:var(--rose-text)"><img alt="" src="' + esc(p['사진썸네일']) + '"></span>' : '';
+    return '<button type="button" class="item item-main" style="flex-direction:row" data-act="openPat" data-id="' + esc(p.ID) + '">' + thumb +
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">' +
+        '<span class="row-between" style="align-items:center"><span style="font-size:16px;font-weight:700">' + esc(p['이름']) + (p['직분'] ? ' ' + esc(p['직분']) : '') + ' <span class="muted" style="font-size:13px;font-weight:400">' + esc([p['성별'], birthLabel(p['연생'])].filter(String).join(' · ')) + '</span></span>' + statusChip(p['상황']) + '</span>' +
+        '<span style="font-size:13px">' + esc(p['병명'] || '') + (p['병원'] ? ' <span class="muted">· ' + esc(p['병원']) + '</span>' : '') + '</span>' +
+        (function () { var c = dayDiff(p['최근통화']); return '<span class="small" style="display:flex;align-items:center;gap:6px;color:' + (c === null || c < -14 ? 'var(--rose-text)' : 'var(--sub)') + '">' + I.phone + (c === null ? '통화 기록 없음' : '최근 통화 ' + esc(shortDate(p['최근통화'])) + ' <span style="font-weight:700">' + dLabel(c) + '</span>') + '</span>'; })() +
+        (p['다음진료일'] ? '<span class="muted small" style="display:flex;align-items:center;gap:6px">' + I.cal.replace(/22/g, '15') + '다음 진료 ' + esc(shortDate(p['다음진료일'])) + ' (' + weekday(p['다음진료일']) + ') <span style="font-weight:700;color:' + (n !== null && n <= 3 ? 'var(--rose-text)' : 'var(--sub)') + '">' + dLabel(n) + '</span></span>' : '') +
+      '</span></button>';
+  }).join('');
+}
+
+R.patList = function () {
+  if (!canPat()) return R.needCode('환우', '환우 정보는 마스터 코드를 입력해야 볼 수 있어요.');
+  var filters = [['all', '전체'], ['hosp', '입원'], ['out', '통원'], ['soon', '진료 임박순'], ['call', '통화 오래된 순']].map(function (f) {
+    return '<button type="button" class="' + (S.filterPat === f[0] ? 'on' : '') + '" data-act="filterPat" data-v="' + f[0] + '">' + f[1] + '</button>';
+  }).join('');
+  return '<div class="pad stack" style="padding-top:20px;padding-bottom:12px;gap:12px">' +
+      '<div style="display:flex;align-items:baseline;gap:8px"><h1 class="serif" style="margin:0;font-size:26px">환우</h1><span class="muted" style="font-size:14px">' + patients().length + '명</span></div>' +
+      '<label class="search">' + I.search + '<input type="search" placeholder="이름, 병원으로 찾기" aria-label="환우 검색" data-q="pat" value="' + esc(S.qPat) + '"></label>' +
+      '<div class="filters">' + filters + '</div>' +
+    '</div>' +
+    '<div class="list" id="listArea">' + patItems() + '</div>' +
+    '<button type="button" class="fab" data-act="openPat" data-id="">' + I.plus + '등록</button>' +
+    nav('patList');
+};
+
+/* 환우 상세 */
+R.patDetail = function () {
+  if (!canPat()) return R.needCode('환우', '환우 정보는 마스터 코드를 입력해야 볼 수 있어요.');
+  var id = S.params.id || '';
+  var p = id ? findPat(id) : { ID: '', '이름': '' };
+  if (!p) return '<div class="top"><button type="button" class="ibtn" data-act="nav" data-to="patList" aria-label="목록으로">' + I.back + '</button></div><div class="empty">이 환우를 찾을 수 없어요. 지워졌을 수 있어요.</div>';
+  if (S.draftKey !== 'pat:' + id) { S.draft = clone(p); S.draft.pendingPhoto = null; S.draftKey = 'pat:' + id; S.dirty = false; }
+  var d = S.draft, n = dayDiff(d['다음진료일']);
+  var photo = id ? photoBlock('patient', p, 80, 96, true) :
+    '<label class="photo rose" style="width:80px;height:96px;cursor:pointer" aria-label="사진 추가"><span class="frame">' + (d.pendingPhoto ? '<img alt="" src="' + esc(d.pendingPhoto.thumb) + '">' : I.sil(66, 76)) + '</span><span class="cam">' + I.cam + '</span><input class="hide-file" type="file" accept="image/*" data-ch="patPendingPhoto"></label>';
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="patList" aria-label="목록으로">' + I.back + '</button><span class="title">' + (id ? '환우 정보' : '환우 등록') + '</span><button type="button" class="btn" data-act="savePat">저장</button></div>' +
+    '<div class="pad stack narrow" style="padding-bottom:24px">' +
+      '<div style="display:flex;align-items:center;gap:16px;padding:4px 0 10px">' + photo +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><span class="serif" style="font-size:26px">' + esc(d['이름'] || (id ? '' : '새 환우')) + (d['직분'] ? ' <span style="font-family:inherit;font-size:16px;font-weight:500;color:var(--sub)">' + esc(d['직분']) + '</span>' : '') + '</span><span class="muted" style="font-size:13px">' + esc([d['성별'], birthLabel(d['연생'])].filter(String).join(' · ')) + '</span><span style="align-self:flex-start">' + statusChip(d['상황']) + '</span></div></div>' +
+      (d['다음진료일'] ? '<section style="padding:16px 18px;border-radius:18px;background:var(--rose-bg);display:flex;align-items:center;gap:14px;color:var(--rose-text)"><span style="width:48px;height:48px;border-radius:14px;background:var(--surface);display:flex;align-items:center;justify-content:center">' + I.cal + '</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span class="small">다음 진료 예정일</span><span style="font-size:18px;font-weight:700">' + esc(Number(d['다음진료일'].slice(5, 7)) + '월 ' + Number(d['다음진료일'].slice(8, 10)) + '일 (' + weekday(d['다음진료일']) + ')') + '</span></span><span style="font-size:22px;font-weight:700">' + dLabel(n) + '</span></section>' : '') +
+      '<section class="card sec"><h2>기본 정보</h2>' +
+        '<div class="grid2">' + inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') + inputField('직분', '직분', d['직분'], 'type="text" maxlength="20" placeholder="예) 권사"') + '</div>' +
+        '<div class="field">성별' + seg('성별', ['남', '여'], d['성별'], 2) + '</div>' +
+        inputField('연생 (예: 1951)', '연생', d['연생'], 'type="text" inputmode="numeric" maxlength="4"') +
+        inputField('병명', '병명', d['병명'], 'type="text" maxlength="100"') +
+        inputField('병원', '병원', d['병원'], 'type="text" maxlength="100"') +
+        inputField('다음 진료 예정일', '다음진료일', d['다음진료일'], 'type="date" data-ch="set"') +
+      '</section>' +
+      '<section class="card sec"><div class="row-between"><h2>최근 통화</h2>' + (d['최근통화'] ? '<span class="small" style="font-weight:700;color:' + (dayDiff(d['최근통화']) < -14 ? 'var(--rose-text)' : 'var(--green-text)') + '">' + dLabel(dayDiff(d['최근통화'])) + '</span>' : '') + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:flex-end"><div style="flex:1">' + inputField('통화한 날짜', '최근통화', d['최근통화'], 'type="date" data-ch="set"') + '</div><button type="button" class="btn line" style="min-height:44px" data-act="callToday">오늘 통화</button></div>' +
+      '</section>' +
+      '<section class="card sec"><h2>현재 상황</h2>' + seg('상황', STATUSES, d['상황'], 3) +
+        '<label class="field">상황 메모<textarea rows="4" maxlength="1000" data-f="상황메모" placeholder="예) OO병으로 진단받고 OO치료 후 회복중.">' + esc(d['상황메모']) + '</textarea></label></section>' +
+      '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
+      '<button type="button" class="btn wide" data-act="savePat">저장</button>' +
+      (id ? '<p class="muted small" style="text-align:center;margin:0">마지막 수정 · ' + esc(p['수정일시'] || '—') + '</p><button type="button" class="btn danger" data-act="delPat">명단에서 삭제</button>' : '') +
+      footer() +
+    '</div>';
+};
+
+/* 임신 */
+function pregMatches(p) {
+  var q = S.qPreg.trim();
+  if (q && String(p['이름']).indexOf(q) < 0) return false;
+  if (S.filterPreg === 'soon') { var n = dayDiff(p['출산예정일']); return n !== null && n >= 0 && n <= 30; }
+  if (S.filterPreg === 'care') return careState(p) === 'now';
+  return true;
+}
+function pregItems() {
+  var list = pregs().filter(pregMatches).sort(function (a, b) {
+    var x = dayDiff(a['출산예정일']), y = dayDiff(b['출산예정일']);
+    if (x === null) return 1; if (y === null) return -1; return x - y;
+  });
+  if (!list.length) return '<div class="empty">' + (pregs().length ? '찾는 조건에 맞는 분이 없어요.' : '아직 등록된 분이 없어요.<br>오른쪽 아래 등록 버튼으로 시작해 보세요.') + '</div>';
+  return list.map(function (p) {
+    var n = dayDiff(p['출산예정일']);
+    return '<button type="button" class="item item-main" data-act="openPreg" data-id="' + esc(p.ID) + '">' +
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">' +
+        '<span class="row-between" style="align-items:center"><span style="font-size:16px;font-weight:700">' + esc(p['이름']) + (p['직분'] ? ' ' + esc(p['직분']) : '') + ' <span class="muted" style="font-size:13px;font-weight:400">' + esc([birthLabel(p['연생']), p['출산방법'] && p['출산방법'] !== '미정' ? p['출산방법'] : ''].filter(String).join(' · ')) + '</span></span>' +
+          '<span style="display:flex;gap:6px">' + (p['몇째'] ? '<span class="chip pink" style="font-weight:500">' + esc(p['몇째']) + '</span>' : '') + (p['아기성별'] ? '<span class="chip gray">' + esc(p['아기성별'] === '미정' ? '성별 미정' : p['아기성별']) + '</span>' : '') + '</span></span>' +
+        (p['출산예정일'] ? '<span class="muted small" style="display:flex;align-items:center;gap:6px">' + I.cal.replace(/22/g, '15') + '출산 예정 ' + esc(shortDate(p['출산예정일'])) + ' (' + weekday(p['출산예정일']) + ') <span style="font-weight:700;color:' + (n !== null && n <= 14 ? 'var(--pink-text)' : 'var(--sub)') + '">' + dLabel(n) + '</span></span>' : '<span class="muted small">예정일 미입력</span>') +
+        (careLabel(p) ? '<span class="small" style="display:flex;align-items:center;gap:6px;color:' + (careState(p) === 'now' ? 'var(--pink-text)' : 'var(--sub)') + '">' + I.home.replace(/22/g, '15') + esc(careLabel(p)) + (careState(p) === 'now' ? ' <span class="chip pink" style="font-size:11px;padding:1px 7px;font-weight:500">지금 조리원</span>' : '') + '</span>' : '') +
+      '</span></button>';
+  }).join('');
+}
+
+R.pregList = function () {
+  if (!canPreg()) return R.needCode('임신', '임신 정보는 마스터 코드를 입력해야 볼 수 있어요.');
+  var filters = [['all', '전체'], ['soon', '30일 안 출산'], ['care', '조리원 중']].map(function (f) {
+    return '<button type="button" class="' + (S.filterPreg === f[0] ? 'on' : '') + '" data-act="filterPreg" data-v="' + f[0] + '">' + f[1] + '</button>';
+  }).join('');
+  return '<div class="pad stack" style="padding-top:20px;padding-bottom:12px;gap:12px">' +
+      '<div style="display:flex;align-items:baseline;gap:8px"><h1 class="serif" style="margin:0;font-size:26px">임신</h1><span class="muted" style="font-size:14px">' + pregs().length + '명 · 예정일 가까운 순</span></div>' +
+      '<label class="search">' + I.search + '<input type="search" placeholder="이름으로 찾기" aria-label="임신 명단 검색" data-q="preg" value="' + esc(S.qPreg) + '"></label>' +
+      '<div class="filters">' + filters + '</div>' +
+    '</div>' +
+    '<div class="list" id="listArea">' + pregItems() + '</div>' +
+    '<button type="button" class="fab" data-act="openPreg" data-id="">' + I.plus + '등록</button>' +
+    nav('pregList');
+};
+
+R.pregDetail = function () {
+  if (!canPreg()) return R.needCode('임신', '임신 정보는 마스터 코드를 입력해야 볼 수 있어요.');
+  var id = S.params.id || '';
+  var p = id ? findPreg(id) : { ID: '', '이름': '' };
+  if (!p) return '<div class="top"><button type="button" class="ibtn" data-act="nav" data-to="pregList" aria-label="목록으로">' + I.back + '</button></div><div class="empty">이 정보를 찾을 수 없어요. 지워졌을 수 있어요.</div>';
+  if (S.draftKey !== 'preg:' + id) { S.draft = clone(p); S.draftKey = 'preg:' + id; S.dirty = false; }
+  var d = S.draft, n = dayDiff(d['출산예정일']);
+  var sub = [birthLabel(d['연생']), d['몇째'], d['아기성별'] ? (d['아기성별'] === '미정' ? '성별 미정' : '아기 ' + d['아기성별']) : '', d['출산방법'] && d['출산방법'] !== '미정' ? d['출산방법'] : ''].filter(String).join(' · ');
+  return '<div class="top"><button type="button" class="ibtn" data-act="back" data-to="pregList" aria-label="목록으로">' + I.back + '</button><span class="title">' + (id ? '임신 정보' : '임신 등록') + '</span><button type="button" class="btn" data-act="savePreg">저장</button></div>' +
+    '<div class="pad stack narrow" style="padding-bottom:24px">' +
+      '<div style="display:flex;align-items:center;gap:16px;padding:4px 0 10px"><span style="width:64px;height:64px;border-radius:20px;background:var(--pink-bg);color:var(--pink-text);display:flex;align-items:center;justify-content:center">' + I.baby.replace(/22/g, '32') + '</span>' +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><span class="serif" style="font-size:26px">' + esc(d['이름'] || (id ? '' : '새로 등록')) + (d['직분'] ? ' <span style="font-family:inherit;font-size:16px;font-weight:500;color:var(--sub)">' + esc(d['직분']) + '</span>' : '') + '</span><span class="muted" style="font-size:13px">' + esc(sub) + '</span></div></div>' +
+      (d['출산예정일'] ? '<section style="padding:16px 18px;border-radius:18px;background:var(--pink-bg);display:flex;align-items:center;gap:14px;color:var(--pink-text)"><span style="width:48px;height:48px;border-radius:14px;background:var(--surface);display:flex;align-items:center;justify-content:center">' + I.cal + '</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span class="small">출산 예정일</span><span style="font-size:18px;font-weight:700">' + esc(Number(d['출산예정일'].slice(5, 7)) + '월 ' + Number(d['출산예정일'].slice(8, 10)) + '일 (' + weekday(d['출산예정일']) + ')') + '</span></span><span style="font-size:22px;font-weight:700">' + dLabel(n) + '</span></section>' : '') +
+      '<section class="card sec"><h2>기본 정보</h2>' +
+        '<div class="grid2">' + inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') + inputField('직분', '직분', d['직분'], 'type="text" maxlength="20" placeholder="예) 집사"') + '</div>' +
+        inputField('연생 (예: 1992)', '연생', d['연생'], 'type="text" inputmode="numeric" maxlength="4"') +
+        inputField('출산 예정일', '출산예정일', d['출산예정일'], 'type="date" data-ch="set"') +
+      '</section>' +
+      '<section class="card sec"><h2>아기</h2>' +
+        '<div class="field">성별' + seg('아기성별', BABY, d['아기성별'], 3) + '</div>' +
+        '<div class="field">몇째' + seg('몇째', ORDERS, d['몇째'], 4) + '</div>' +
+        '<div class="field">출산 방법' + seg('출산방법', BIRTH_WAYS, d['출산방법'], 3) + '</div>' +
+      '</section>' +
+      '<section class="card sec"><div class="row-between"><h2>조리원</h2>' + (careState(d) === 'now' ? '<span class="chip pink" style="font-weight:500">지금 조리원</span>' : '') + '</div>' +
+        inputField('조리원 이름', '조리원', d['조리원'], 'type="text" maxlength="60" placeholder="조리원 이름"') +
+        '<div class="grid2">' + inputField('입소일', '조리원입소', d['조리원입소'], 'type="date" data-ch="set"') + inputField('퇴소일', '조리원퇴소', d['조리원퇴소'], 'type="date" data-ch="set"') + '</div>' +
+        (d['조리원입소'] && d['조리원퇴소'] && d['조리원퇴소'] >= d['조리원입소'] ? '<span class="muted small">' + (dayDiff(d['조리원퇴소']) - dayDiff(d['조리원입소']) + 1) + '일 동안 · 심방 계획에 참고하세요</span>' : '') +
+      '</section>' +
+      '<section class="card sec"><label class="field" style="font-size:15px;font-weight:700;color:var(--text)">메모<textarea rows="3" maxlength="1000" data-f="메모" placeholder="기도제목 등">' + esc(d['메모']) + '</textarea></label></section>' +
+      '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
+      '<button type="button" class="btn wide" data-act="savePreg">저장</button>' +
+      (id ? '<p class="muted small" style="text-align:center;margin:0">마지막 수정 · ' + esc(p['수정일시'] || '—') + '</p><button type="button" class="btn danger" data-act="delPreg">명단에서 삭제</button>' : '') +
+      footer() +
+    '</div>';
+};
+
+/* ---------- 입력 처리 ---------- */
+function setPath(path, val) {
+  var parts = path.split('.'), o = S.draft;
+  for (var i = 0; i < parts.length - 1; i++) o = o[/^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i]];
+  o[parts[parts.length - 1]] = val;
+  S.dirty = true;
+}
+
+function markEmpty(e) { var el = e.target; if (el.type === 'date' && el.hasAttribute('data-ph')) el.setAttribute('data-empty', el.value ? '0' : '1'); }
+document.addEventListener('input', markEmpty, true);
+document.addEventListener('change', markEmpty, true);
+document.addEventListener('input', function (e) {
+  var el = e.target;
+  if (el.getAttribute('data-q') === 'new') { S.qNew = el.value; document.getElementById('listArea').innerHTML = newItems(); return; }
+  if (el.getAttribute('data-q') === 'preg') { S.qPreg = el.value; document.getElementById('listArea').innerHTML = pregItems(); return; }
+  if (el.getAttribute('data-q') === 'pat') { S.qPat = el.value; document.getElementById('listArea').innerHTML = patItems(); return; }
+  if (el.getAttribute('data-code')) { S.code = el.value.replace(/\D/g, '').slice(0, 8); return; }
+  var f = el.getAttribute('data-f');
+  if (f && !el.getAttribute('data-ch') && S.draft) setPath(f, el.value);
+});
+
+var C = {
+  set: function (el) { setPath(el.getAttribute('data-f'), el.value); rerender(); },
+  gender: function (el) {
+    setPath('성별', el.value);
+    if (S.draft['전도회'] && missions(el.value).indexOf(S.draft['전도회']) < 0) S.draft['전도회'] = '';
+    rerender();
+  },
+  edu: function (el) { var k = el.getAttribute('data-k'); S.draft[k] = el.checked ? (S.draft[k] || today()) : ''; S.dirty = true; rerender(); },
+  uploadFile: function (el) {
+    var f = el.files[0];
+    if (!f) return;
+    S.upload = { status: 'reading', fileName: f.name };
+    rerender();
+    parseSheetFile(f).then(function (p) {
+      if (!p.rows.length) throw new Error('파일에서 사람을 찾지 못했어요. 2번째 줄부터 적혀 있는지 확인해 주세요.');
+      S.upload.rows = p.rows; S.upload.cols = p.cols; S.upload.status = 'checking'; rerender();
+      return call('bulkRegister', [S.token, p.rows, true]);
+    }).then(function (res) {
+      if (!res) return;
+      S.upload.result = res; S.upload.status = 'ready'; rerender();
+    }).catch(function (e) {
+      S.upload = { status: 'idle', err: (e && e.message ? e.message : String(e)).replace(/^Error:\s*/, '') };
+      rerender();
+    });
+  },
+  ceremony: function (el) { S.draft['수료식'] = el.checked ? (S.draft['수료식'] || today()) : ''; S.dirty = true; rerender(); },
+  year: function (el) { S.yearNew = el.value; rerender(); },
+  visit: function (el) { S.draft['등록심방'] = el.checked ? (S.draft['등록심방'] || today()) : ''; S.dirty = true; rerender(); },
+  farm: function (el) { S.draft['목장연결'] = el.value; if (el.value !== 'Y') S.draft['목장'] = ''; S.dirty = true; rerender(); },
+  head1: function (el) { S.draft['신앙세대주'] = el.checked ? 'Y' : 'N'; S.dirty = true; },
+  mode: function (el) { S.draft.mode = el.value; if (el.value === 'single') S.draft.members = S.draft.members.slice(0, 1); S.draft.members[0]['신앙세대주'] = 'Y'; S.dirty = true; rerender(); },
+  regHead: function (el) { var i = Number(el.getAttribute('data-i')); S.draft.members.forEach(function (m, j) { m['신앙세대주'] = j === i ? 'Y' : 'N'; }); S.dirty = true; rerender(); },
+  regPhoto: function (el) {
+    var i = Number(el.getAttribute('data-i'));
+    readPhoto(el.files[0]).then(function (ph) { if (ph) { S.draft.members[i].photo = ph; S.dirty = true; rerender(); } });
+  },
+  patPendingPhoto: function (el) { readPhoto(el.files[0]).then(function (ph) { if (ph) { S.draft.pendingPhoto = ph; S.dirty = true; rerender(); } }); },
+  photo: function (el) {
+    var kind = el.getAttribute('data-kind'), id = S.params.id;
+    readPhoto(el.files[0]).then(function (ph) {
+      if (!ph) return;
+      return call('uploadPhoto', [S.token, kind, id, ph.full, ph.thumb]).then(function () {
+        S.photo[kind + id] = { stamp: 'fresh', src: ph.full };
+        var keep = S.dirty ? S.draft : null;
+        return loadData().then(function () {
+          if (keep) { S.draft = keep; S.dirty = true; }
+          rerender(); toast('사진을 올렸어요.');
+        });
+      });
+    }).catch(function () {});
+  }
+};
+document.addEventListener('change', function (e) {
+  var el = e.target, ch = el.getAttribute('data-ch');
+  if (ch && C[ch]) C[ch](el);
+});
+
+function readPhoto(file) {
+  if (!file) return Promise.resolve(null);
+  if (!/^image\//.test(file.type)) { toast('사진 파일을 골라 주세요.'); return Promise.resolve(null); }
+  return new Promise(function (resolve) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        function draw(max, q) {
+          var s = Math.min(1, max / Math.max(img.width, img.height));
+          var c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.width * s)); c.height = Math.max(1, Math.round(img.height * s));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          return c.toDataURL('image/jpeg', q);
+        }
+        resolve({ full: draw(1200, 0.82), thumb: draw(160, 0.7) });
+      };
+      img.onerror = function () { toast('이 사진은 읽을 수 없어요. 다른 사진으로 해 주세요.'); resolve(null); };
+      img.src = fr.result;
+    };
+    fr.onerror = function () { resolve(null); };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- 버튼 동작 ---------- */
+var A = {
+  nav: function (el) { leave(el.getAttribute('data-to')); },
+  back: function (el) { leave(el.getAttribute('data-to')); },
+  key: function (el) { if (S.code.length < 8) S.code += el.getAttribute('data-k'); S.loginMsg = ''; rerender(); },
+  keyDel: function () { S.code = S.code.slice(0, -1); rerender(); },
+  keyOk: function () { submitCode(); },
+  logout: function () {
+    confirmBox('이 기기에서 나갈까요? 다시 쓰려면 코드를 입력해야 해요.', '나가기').then(function (ok) {
+      if (!ok) return;
+      var t = S.token;
+      S.token = null; S.roles = []; S.data = null; store('yb_token', null);
+      call('logout', [t], true).catch(function () {});
+      S.loginMsg = ''; go('login');
+    });
+  },
+  tabNew: function (el) { S.tabNew = el.getAttribute('data-v'); rerender(); },
+  completeFam: function (el) {
+    if (S.dirty) { toast('바꾼 내용을 먼저 저장해 주세요.'); return; }
+    var id = el.getAttribute('data-id'), done = el.getAttribute('data-done') === '1';
+    var f = families().filter(function (x) { return x.id === id; })[0];
+    if (!f) return;
+    var who = f.all.length > 1 ? f.head['이름'] + '님 가족 ' + f.all.length + '명을' : f.head['이름'] + '님을';
+    var msg = done ? (famReady(f) ? who + ' 전체 완료 명단으로 옮길까요?' : '아직 마치지 않은 항목이 있어요. 그래도 ' + who + ' 전체 완료로 옮길까요?') : who + ' 다시 진행 중 목록으로 되돌릴까요?';
+    confirmBox(msg, done ? '완료로 옮기기' : '되돌리기').then(function (ok) {
+      if (!ok) return;
+      call('completeFamily', [S.token, id, done]).then(function () { return loadData(); }).then(function () {
+        S.tabNew = done ? 'done' : 'active'; S.filterNew = 'all';
+        go('newList');
+        toast(done ? '전체 완료 명단으로 옮겼어요.' : '진행 중으로 되돌렸어요.');
+      }).catch(function () {});
+    });
+  },
+  filterNew: function (el) { S.filterNew = el.getAttribute('data-v'); rerender(); },
+  filterPat: function (el) { S.filterPat = el.getAttribute('data-v'); rerender(); },
+  toggleFam: function (el) { var id = el.getAttribute('data-id'); S.openFam[id] = !S.openFam[id]; rerender(); },
+  openNew: function (el) { go('newDetail', { id: el.getAttribute('data-id') }); },
+  openPat: function (el) { go('patDetail', { id: el.getAttribute('data-id') }); },
+  callToday: function () { S.draft['최근통화'] = today(); S.dirty = true; rerender(); },
+  openPreg: function (el) { go('pregDetail', { id: el.getAttribute('data-id') }); },
+  filterPreg: function (el) { S.filterPreg = el.getAttribute('data-v'); rerender(); },
+  savePreg: function () {
+    var id = S.params.id || '', d = S.draft, p = id ? findPreg(id) : {}, changes = {}, n = 0;
+    if (!String(d['이름'] || '').trim()) { S.err.form = '이름을 적어 주세요.'; rerender(); return; }
+    if (d['연생'] && !/^\d{4}$/.test(d['연생'])) { S.err.form = '연생은 1992처럼 네 자리로 적어 주세요.'; rerender(); return; }
+    if (d['조리원입소'] && d['조리원퇴소'] && d['조리원퇴소'] < d['조리원입소']) { S.err.form = '조리원 퇴소일이 입소일보다 빨라요.'; rerender(); return; }
+    PREG_EDITABLE.forEach(function (k) { if ((d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
+    if (!n) { toast('바뀐 내용이 없어요.'); return; }
+    S.err = {};
+    call('savePregnancy', [S.token, id, changes]).then(function () {
+      S.dirty = false; S.draftKey = null;
+      return loadData().then(function () { go('pregList'); toast('저장했어요.'); });
+    }).catch(function () {});
+  },
+  delPreg: function () {
+    var p = findPreg(S.params.id);
+    confirmBox(p['이름'] + '님을 임신 명단에서 지울까요? 되돌릴 수 없어요.', '지우기').then(function (ok) {
+      if (!ok) return;
+      call('deletePregnancy', [S.token, p.ID]).then(function () { return loadData(); }).then(function () { go('pregList'); toast('명단에서 지웠어요.'); }).catch(function () {});
+    });
+  },
+  newRegister: function () { go('newRegister', {}); },
+  openUpload: function () { S.upload = { status: 'idle' }; leave('newUpload'); },
+  uploadCommit: function () {
+    var U = S.upload;
+    U.status = 'saving'; rerender();
+    call('bulkRegister', [S.token, U.rows, false]).then(function (res) {
+      S.upload = { status: 'idle' };
+      return loadData().then(function () {
+        S.tabNew = 'active'; S.filterNew = 'all';
+        go('newList');
+        toast(res.people + '명(' + res.families + '가정)을 등록했어요.' + (res.errors.length ? ' ' + res.errors.length + '줄은 뺐어요.' : ''));
+      });
+    }).catch(function () { U.status = 'ready'; rerender(); });
+  },
+  addFamily: function (el) { leave('newRegister', { familyId: el.getAttribute('data-id') }); },
+  addMember: function () { S.draft.members.push(blankMember(false)); S.dirty = true; rerender(); },
+  removeMember: function (el) {
+    var i = Number(el.getAttribute('data-i'));
+    var wasHead = S.draft.members[i]['신앙세대주'] === 'Y';
+    S.draft.members.splice(i, 1);
+    if (wasHead && S.draft.members.length && !S.params.familyId) S.draft.members[0]['신앙세대주'] = 'Y';
+    S.dirty = true; rerender();
+  },
+  saveNew: function () {
+    var p = findNew(S.params.id), d = S.draft, changes = {}, n = 0;
+    if (!String(d['이름'] || '').trim()) { S.err.form = '이름을 적어 주세요.'; rerender(); return; }
+    if (d['연생'] && !/^\d{4}$/.test(d['연생'])) { S.err.form = '연생은 1978처럼 네 자리로 적어 주세요.'; rerender(); return; }
+    NEW_EDITABLE.forEach(function (k) { if ((d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
+    if (!n) { toast('바뀐 내용이 없어요.'); return; }
+    S.err = {};
+    call('updateNewcomer', [S.token, p.ID, changes]).then(function () {
+      S.dirty = false; S.draftKey = null;
+      var f = familyOf(p);
+      if (f && f.all.length > 1) S.openFam[f.id] = true;
+      return loadData();
+    }).then(function () { go('newList'); toast('저장했어요.'); }).catch(function () {});
+  },
+  delNew: function () {
+    var p = findNew(S.params.id);
+    confirmBox(p['이름'] + '님을 새가족 명단에서 지울까요? 되돌릴 수 없어요.', '지우기').then(function (ok) {
+      if (!ok) return;
+      call('deleteNewcomer', [S.token, p.ID]).then(function () { return loadData(); }).then(function () { go('newList'); toast('명단에서 지웠어요.'); }).catch(function () {});
+    });
+  },
+  saveReg: function () {
+    var d = S.draft, famId = S.params.familyId || '';
+    var bad = d.members.filter(function (m) { return !String(m['이름'] || '').trim(); }).length;
+    if (bad) { S.err.form = '이름을 모두 적어 주세요.'; rerender(); return; }
+    if (d.members.some(function (m) { return m['연생'] && !/^\d{4}$/.test(m['연생']); })) { S.err.form = '연생은 1982처럼 네 자리로 적어 주세요.'; rerender(); return; }
+    S.err = {};
+    var members = d.members.map(function (m) { return { '이름': m['이름'].trim(), '관계': m['관계'], '성별': m['성별'], '연생': m['연생'], '신앙세대주': famId ? 'N' : m['신앙세대주'] }; });
+    call('registerNewcomers', [S.token, { familyId: famId, common: d.common, members: members }]).then(function (res) {
+      var ups = d.members.map(function (m, i) { return m.photo ? function () { return call('uploadPhoto', [S.token, 'new', res.ids[i], m.photo.full, m.photo.thumb]); } : null; }).filter(Boolean);
+      return ups.reduce(function (pr, f) { return pr.then(f); }, Promise.resolve()).then(function () { return res; });
+    }).then(function (res) {
+      S.dirty = false;
+      S.openFam[res.familyId] = true;
+      return loadData().then(function () { go('newList'); toast(d.members.length > 1 ? d.members.length + '명을 등록했어요.' : '등록했어요.'); });
+    }).catch(function () {});
+  },
+  savePat: function () {
+    var id = S.params.id || '', d = S.draft, p = id ? findPat(id) : {}, changes = {}, n = 0;
+    if (!String(d['이름'] || '').trim()) { S.err.form = '이름을 적어 주세요.'; rerender(); return; }
+    if (d['연생'] && !/^\d{4}$/.test(d['연생'])) { S.err.form = '연생은 1951처럼 네 자리로 적어 주세요.'; rerender(); return; }
+    PAT_EDITABLE.forEach(function (k) { if ((d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
+    if (!n && !d.pendingPhoto) { toast('바뀐 내용이 없어요.'); return; }
+    S.err = {};
+    var pending = d.pendingPhoto;
+    call('savePatient', [S.token, id, changes]).then(function (res) {
+      if (pending) return call('uploadPhoto', [S.token, 'patient', res.id, pending.full, pending.thumb]).then(function () { return res; });
+      return res;
+    }).then(function (res) {
+      S.dirty = false; S.draftKey = null;
+      return loadData().then(function () {
+        go('patList');
+        toast('저장했어요.');
+      });
+    }).catch(function () {});
+  },
+  delPat: function () {
+    var p = findPat(S.params.id);
+    confirmBox(p['이름'] + '님을 환우 명단에서 지울까요? 되돌릴 수 없어요.', '지우기').then(function (ok) {
+      if (!ok) return;
+      call('deletePatient', [S.token, p.ID]).then(function () { return loadData(); }).then(function () { go('patList'); toast('명단에서 지웠어요.'); }).catch(function () {});
+    });
+  }
+};
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('[data-act]');
+  if (!el) return;
+  var fn = A[el.getAttribute('data-act')];
+  if (fn) { e.preventDefault(); fn(el, e); }
+});
+
+document.addEventListener('keydown', function (e) {
+  if (S.screen !== 'login' || document.querySelector('.modal')) return;
+  if (/^\d$/.test(e.key)) { if (S.code.length < 8) S.code += e.key; S.loginMsg = ''; rerender(); e.preventDefault(); }
+  else if (e.key === 'Backspace') { S.code = S.code.slice(0, -1); rerender(); e.preventDefault(); }
+  else if (e.key === 'Enter') { submitCode(); e.preventDefault(); }
+});
+
+function submitCode() {
+  if (S.code.length < 4) { S.loginMsg = '코드를 끝까지 입력해 주세요.'; rerender(); return; }
+  var code = S.code;
+  call('login', [code, DEVICE, S.token || '']).then(function (res) {
+    S.code = '';
+    if (!res.ok) { S.loginMsg = res.msg; rerender(); return; }
+    S.token = res.token; S.roles = res.roles; store('yb_token', res.token);
+    S.loginMsg = '';
+    return loadData().then(function () {
+      go((res.added === 'newEdit' || res.added === 'newView') ? 'newList' : 'home');
+    });
+  }).catch(function () { S.code = ''; rerender(); });
+}
+
+/* ---------- 실시간 반영 ---------- */
+function poll() {
+  if (!S.token || document.hidden || S.busy || S.screen === 'login') return;
+  call('getVersion', [S.token], true).then(function (v) {
+    if (v !== S.version) {
+      return loadData(true).then(function () { if (!S.dirty && !document.querySelector('.modal')) rerender(); });
+    }
+    S.lastSync = new Date();
+    var l = document.getElementById('syncLabel'); if (l) l.textContent = '방금 동기화됨';
+  }).catch(function () {});
+}
+setInterval(poll, 30000);
+document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
+
+/* ---------- 시작 ---------- */
+S.token = load('yb_token');
+if (S.token) {
+  render();
+  loadData(true).then(function () { go('home'); }).catch(function () { if (S.screen === 'loading') go('login'); });
+} else {
+  go('login');
+}
+})();
+</script>
+</body>
+</html>
