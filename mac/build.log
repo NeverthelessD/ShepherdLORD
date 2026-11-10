@@ -1,0 +1,16 @@
+app/shell/main.swift:192:9: warning: result of 'try?' is unused [#no-usage]
+190 |             throw error
+191 |         }
+192 |         try? run("/usr/bin/xattr", ["-dr", "com.apple.quarantine", cur.path])
+    |         `- warning: result of 'try?' is unused [#no-usage]
+193 |     }
+194 | 
+app/shell/main.swift:192:9: warning: result of 'try?' is unused [#no-usage]
+190 |             throw error
+191 |         }
+192 |         try? run("/usr/bin/xattr", ["-dr", "com.apple.quarantine", cur.path])
+    |         `- warning: result of 'try?' is unused [#no-usage]
+193 |     }
+194 | 
+build/mac/ShepherdLORD.app: replacing existing signature
+built build/mac/ShepherdLORD.app (1.0.0)
