@@ -46,5 +46,7 @@
 - v1.0.0 내려받기 `download/ShepherdLORD.zip` (ShepherdLORD/ShepherdLORD.app + 사용가이드-맥.png).
 - ci-results 브랜치는 `mac/`, `windows/` 하위 폴더로 나눔(scripts/push-ci-results.sh).
 
+- 2026-11-10 연생 옆에 나이 표시: "92년생 (34세)". 나이 = 올해 연도 − 연생(연 나이, 생일 상관없이 올해 되는 만 나이). 새가족·환우·임신 목록과 상세 모두(birthLabel 한 곳). 해가 바뀌면 저절로 올라감.
+
 ## 할 일
 - [ ] 실제 사용자 PC · 맥에서 처음 실행(보호 창), 사진 · 엑셀 올리기 파일 창 확인
