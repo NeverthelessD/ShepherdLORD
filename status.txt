@@ -1,0 +1,6 @@
+build=ok
+smoke=ok
+version=1.0.0
+update_sha256=677d294d0c15b95148bb4142f8bdd3fea81b1621facb91e29d7c5747fa2179d3
+smoke_detail=smoke=ok title=영복교회 성도 돌봄
+commit=62f16d9465be8603588898c62affb8a4b129c472
