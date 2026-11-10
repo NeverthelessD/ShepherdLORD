@@ -10,7 +10,12 @@ count() { pgrep -x ShepherdLORD | wc -l | tr -d ' '; }
 
 # 1) 화면 캡처 + 앱 제목 확인
 "$APP/Contents/MacOS/ShepherdLORD" --smoke "$OUT/smoke" &
-pid=$!; for i in $(seq 1 150); do kill -0 $pid 2>/dev/null || break; sleep 1; done; kill $pid 2>/dev/null
+pid=$!; shot=0
+for i in $(seq 1 300); do
+  kill -0 $pid 2>/dev/null || break
+  if [ $shot = 0 ] && [ -f "$OUT/smoke/about-open" ]; then screencapture -x "$OUT/smoke/about-screen.png" 2>/dev/null; shot=1; fi
+  sleep 0.5
+done; kill $pid 2>/dev/null
 if grep -q '^smoke=ok' "$OUT/smoke/smoke.txt" 2>/dev/null; then res "screens=ok $(cat "$OUT/smoke/smoke.txt")"; else res "screens=fail $(cat "$OUT/smoke/smoke.txt" 2>/dev/null)"; fail=1; fi
 
 # 2) 켜기

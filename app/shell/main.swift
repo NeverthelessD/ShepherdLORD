@@ -252,6 +252,9 @@ final class AboutWindow: NSWindowController {
         let l = NSTextField(labelWithString: s)
         l.font = .systemFont(ofSize: size, weight: weight); l.textColor = color; l.alignment = .center
         l.lineBreakMode = .byWordWrapping; l.maximumNumberOfLines = 2
+        l.preferredMaxLayoutWidth = 340
+        l.translatesAutoresizingMaskIntoConstraints = false
+        l.widthAnchor.constraint(equalToConstant: 340).isActive = true
         return l
     }
 
@@ -261,6 +264,8 @@ final class AboutWindow: NSWindowController {
         let name = label(AppInfo.name, size: 19, weight: .bold, color: .labelColor)
         let ver = label("영복교회 성도 돌봄 · 버전 \(AppInfo.version)", size: 13)
         let note = label("앱 안의 새 기능은 열 때마다 자동으로 반영돼요.", size: 12)
+        status.translatesAutoresizingMaskIntoConstraints = false
+        status.widthAnchor.constraint(equalToConstant: 340).isActive = true
         status.alignment = .center; status.font = .systemFont(ofSize: 12); status.textColor = NSColor(name: nil) { a in
             a.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor(srgbRed: 0.49, green: 0.77, blue: 0.66, alpha: 1) : NSColor(srgbRed: 0.18, green: 0.42, blue: 0.34, alpha: 1)
         }
@@ -280,13 +285,15 @@ final class AboutWindow: NSWindowController {
         stack.setCustomSpacing(16, after: img); stack.setCustomSpacing(18, after: buttons)
         stack.edgeInsets = NSEdgeInsets(top: 28, left: 20, bottom: 22, right: 20)
         stack.translatesAutoresizingMaskIntoConstraints = false
-        let content = NSView()
+        let content = NSView(frame: NSRect(x: 0, y: 0, width: 380, height: 440))
         content.addSubview(stack)
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: content.leadingAnchor), stack.trailingAnchor.constraint(equalTo: content.trailingAnchor),
             stack.topAnchor.constraint(equalTo: content.topAnchor), stack.bottomAnchor.constraint(lessThanOrEqualTo: content.bottomAnchor)
         ])
         window?.contentView = content
+        window?.setContentSize(NSSize(width: 380, height: 440))
+        content.layoutSubtreeIfNeeded()
         window?.center()
     }
 
@@ -664,6 +671,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                         self.snapshot("offline.png") {
                             self.showAbout()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                try? "open".write(to: self.smokeDir!.appendingPathComponent("about-open"), atomically: true, encoding: .utf8)
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                 if let v = self.about?.window?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
                                     v.cacheDisplay(in: v.bounds, to: rep)
                                     try? rep.representation(using: .png, properties: [:])?.write(to: self.smokeDir!.appendingPathComponent("about.png"))
