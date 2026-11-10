@@ -292,7 +292,7 @@ function handleError(e, quiet) {
   var msg = (e && e.message) || String(e || '');
   if (msg.indexOf('NEED_CODE') >= 0) {
     S.token = null; S.roles = []; S.data = null; store('yb_token', null);
-    S.loginMsg = '코드 유효 시간이 지났어요. 다시 입력해 주세요.';
+    S.loginMsg = '로그인이 풀렸어요. 접속 코드가 바뀌었거나 오래 쓰지 않았을 수 있어요. 다시 입력해 주세요.';
     go('login');
     return;
   }
@@ -391,7 +391,7 @@ R.login = function () {
       '<div class="pin" aria-hidden="true">' + pins + '</div>' +
       '<div class="err" role="alert">' + esc(S.loginMsg) + '</div>' +
       '<div class="keys">' + keys + '</div>' +
-      '<p class="muted" style="margin:8px 0 0;font-size:12px;text-align:center;line-height:1.6">5번 틀리면 10분 동안 입력이 잠겨요.<br>입력한 코드는 이 기기에서 12시간 동안 유지돼요.</p>' +
+      '<p class="muted" style="margin:8px 0 0;font-size:12px;text-align:center;line-height:1.6">한 번 입력하면 이 기기에서는 계속 로그인돼요.<br>여럿이 쓰는 기기라면 다 쓴 뒤 홈의 "이 기기에서 나가기"를 눌러 주세요.<br>5번 틀리면 10분 동안 입력이 잠겨요.</p>' +
       footer() +
     '</div>';
 };

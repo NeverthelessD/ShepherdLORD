@@ -38,7 +38,7 @@ var SETTING_FOLDER = '사진 폴더 ID';
 
 var ROLE_LABEL = { master: '마스터 코드', newView: '새가족 보기 코드', newEdit: '새가족 수정 코드', patient: '마스터 코드', pregnancy: '마스터 코드' };
 
-var TOKEN_HOURS = 12;
+var TOKEN_DAYS = 180;      // 한 번 입력하면 이 기간 동안 로그인 유지 (쓸 때마다 다시 늘어나요)
 var DEVICE_MAX_FAILS = 5;
 var GLOBAL_MAX_FAILS = 30;
 var LOCK_SECONDS = 600;
@@ -432,13 +432,12 @@ function login(code, deviceId, existingToken) {
     }
     cache.remove('fail_' + deviceId);
     var sess = existingToken ? readToken_(existingToken) : null;
-    var roles = sess ? sess.roles.slice() : [];
-    var grant = role === 'master' ? ['master', 'newEdit', 'patient', 'pregnancy'] : [role];
-    grant.forEach(function (r) { if (roles.indexOf(r) < 0) roles.push(r); });
-    var token = sess ? existingToken : newToken_();
-    writeToken_(token, roles, sess ? sess.exp : null);
+    var token = sess && sess.codes ? existingToken : newToken_();
+    var codes = sess && sess.codes ? sess.codes : {};
+    codes[role] = codeHash_(token, code);
+    writeToken_(token, codes);
     cleanupTokens_();
-    return { ok: true, token: token, roles: roles, added: role };
+    return { ok: true, token: token, roles: rolesFromCodes_(token, codes), added: role };
   } finally {
     lock.releaseLock();
   }
@@ -466,9 +465,37 @@ function readToken_(token) {
   } catch (e) { return null; }
 }
 
-function writeToken_(token, roles, exp) {
-  var s = { roles: roles, exp: exp || (Date.now() + TOKEN_HOURS * 3600 * 1000) };
+// 로그인 정보: 어떤 코드로 들어왔는지(코드는 그대로 두지 않고 암호처럼 바꿔서) + 만료일
+function writeToken_(token, codes) {
+  var s = { codes: codes, exp: Date.now() + TOKEN_DAYS * 86400000 };
   PropertiesService.getScriptProperties().setProperty('t_' + token, JSON.stringify(s));
+}
+
+function codeHash_(token, code) {
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, 'yb|' + token + '|' + code, Utilities.Charset.UTF_8);
+  return Utilities.base64Encode(bytes);
+}
+
+var CODE_SETTING_OF = { master: SETTING_CODE_MASTER, newEdit: SETTING_CODE_NEW, newView: SETTING_CODE_VIEW };
+
+// 설정 탭의 코드가 바뀌면, 예전 코드로 들어온 기기는 그 권한을 잃어요
+function codeStillValid_(token, role, hash) {
+  var v = getSetting_(CODE_SETTING_OF[role]);
+  if (!v) return false;
+  var cands = [v];
+  if (/^\d+$/.test(v)) for (var n = v.length + 1; n <= 8; n++) cands.push(new Array(n - v.length + 1).join('0') + v);
+  return cands.some(function (c) { return c.length >= 4 && codeHash_(token, c) === hash; });
+}
+
+function rolesFromCodes_(token, codes) {
+  var roles = [];
+  function add(r) { if (roles.indexOf(r) < 0) roles.push(r); }
+  Object.keys(codes || {}).forEach(function (role) {
+    if (!CODE_SETTING_OF[role] || !codeStillValid_(token, role, codes[role])) return;
+    if (role === 'master') ['master', 'newEdit', 'patient', 'pregnancy'].forEach(add);
+    else add(role);
+  });
+  return roles;
 }
 
 function cleanupTokens_() {
@@ -485,9 +512,22 @@ function auth_(token) {
   var s = readToken_(token);
   if (!s) throw new Error('NEED_CODE');
   migrate_();
-  // 환우·임신은 마스터 코드로만 열려요. 마스터면 모든 권한을 줘요.
-  if (s.roles.indexOf('master') >= 0) return ['master', 'newEdit', 'patient', 'pregnancy'];
-  return s.roles.filter(function (r) { return r === 'newView' || r === 'newEdit'; });
+  var clean = String(token).replace(/[^a-f0-9]/g, '');
+  if (!s.codes) {
+    // 예전 방식(12시간) 로그인: 만료될 때까지만 그대로 써요
+    if (!s.roles) throw new Error('NEED_CODE');
+    if (s.roles.indexOf('master') >= 0) return ['master', 'newEdit', 'patient', 'pregnancy'];
+    return s.roles.filter(function (r) { return r === 'newView' || r === 'newEdit'; });
+  }
+  var roles = rolesFromCodes_(clean, s.codes);
+  var props = PropertiesService.getScriptProperties();
+  if (!roles.length) { props.deleteProperty('t_' + clean); throw new Error('NEED_CODE'); }
+  // 쓸 때마다 로그인 유지 기간을 다시 늘려요 (열흘에 한 번 정도만 저장)
+  if (s.exp - Date.now() < (TOKEN_DAYS - 10) * 86400000) {
+    s.exp = Date.now() + TOKEN_DAYS * 86400000;
+    props.setProperty('t_' + clean, JSON.stringify(s));
+  }
+  return roles;
 }
 
 // 새 버전에서 늘어난 칸(수료식, 완료일 등)을 시트에 자동으로 더해요
