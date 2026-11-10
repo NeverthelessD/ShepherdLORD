@@ -35,6 +35,16 @@
 - 2026-11-10 웹앱 로그인 유지(180일, 쓸 때마다 연장, 코드 바꾸면 그 코드 로그인 해제). 윈도우 가이드 문구 갱신 후 zip 다시 올림(앱 버전은 1.0.0 그대로).
 - 2026-11-10 맥 앱 시안 제시(Dock 아이콘, 메뉴 막대 앱 메뉴, 여는 중 라이트·다크, 앱 정보) → 확정 기다리는 중.
 
+## 맥 앱 (2026-11-10)
+- Swift/AppKit 껍데기 `app/shell/main.swift` + WKWebView. 엔진 없음(웹앱을 그대로 여는 창). Dock 앱(LSUIElement 없음), 창 닫아도 Dock 에 남고 Dock 아이콘으로 다시 열림, ⌘Q 종료.
+- 메뉴: ShepherdLORD(에 관하여 · 업데이트 확인 · 진단 정보 보기 · 새로고침 ⌘R · 가리기 · 종료), 편집(복사·붙여넣기), 보기(새로고침 · 크게/작게/실제 크기), 윈도우.
+- 로그인 정보는 앱 전용 WKWebsiteDataStore.default() → 사파리·크롬 계정과 무관, 로그인 유지.
+- 파일 고르기(사진 · 엑셀)는 NSOpenPanel. 바깥 주소는 기본 브라우저.
+- 기록 `~/Library/Application Support/ShepherdLORD/launcher.log`. 업데이트: `releases/latest.json` → sha256 → ditto 풀기 → 버전 확인 → 지금 앱을 backup/ 에 복사 → replaceItemAt → RESTART 빼고 RELAUNCHED=1 로 다시 열기. 앱 정보에 "이전 버전으로 되돌리기"(백업 있을 때).
+- 빌드: universal(arm64 + x86_64), macOS 11+, ad-hoc 서명. 아이콘: 확정 어린양을 824px 로 줄이고 그림자(맥 아이콘 규격).
+- 시험(smoke-mac.sh): 화면 캡처 · 켜기 · Dock 다시 열기 · 종료 · 강제 종료 뒤 다시 켜기 · 업데이트(9.9.9 가짜) 뒤 다시 열기 모두 통과 (macOS 26.7, arm64).
+- v1.0.0 내려받기 `download/ShepherdLORD.zip` (ShepherdLORD/ShepherdLORD.app + 사용가이드-맥.png).
+- ci-results 브랜치는 `mac/`, `windows/` 하위 폴더로 나눔(scripts/push-ci-results.sh).
+
 ## 할 일
-- [ ] 맥 앱: 시안 확정 뒤 Swift/AppKit + WKWebView, macOS 빌드 서버, download/ShepherdLORD.zip
-- [ ] 실제 사용자 PC 에서 처음 실행(PC 보호 창), 사진 · 엑셀 올리기 파일 창 확인
+- [ ] 실제 사용자 PC · 맥에서 처음 실행(보호 창), 사진 · 엑셀 올리기 파일 창 확인
