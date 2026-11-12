@@ -118,6 +118,26 @@ nav.bottom button.on{color:var(--green);font-weight:500}
 #busy{position:fixed;left:0;top:0;height:3px;width:100%;background:var(--green);transform-origin:left;animation:busy 1.2s ease-in-out infinite;z-index:30;display:none}
 #busy.show{display:block}
 @keyframes busy{0%{transform:scaleX(0)}60%{transform:scaleX(.8)}100%{transform:scaleX(1);opacity:0}}
+.memo-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pager{display:flex;align-items:center;gap:2px;font-size:13px;color:var(--sub);white-space:nowrap}
+.pager b{color:var(--text);font-weight:600}
+.pager .ibtn{width:36px;height:36px;color:var(--text)}
+.pager .ibtn:disabled{opacity:.25;cursor:default}
+.memo-date{font-size:12px;color:var(--sub);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.memo-date .chip{padding:2px 8px}
+.memo-text{font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;margin:0}
+.memo-prev{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px;opacity:.55}
+.memo-prev .t{font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mdots{display:flex;gap:6px;justify-content:center}
+.mdots i{width:7px;height:7px;border-radius:4px;background:var(--line)}
+.mdots i.on{background:var(--green);width:18px}
+.acts2{display:flex;gap:8px}
+.acts2 .btn{flex:1}
+.pos{display:flex;flex-wrap:wrap;gap:6px}
+.pos button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);font-size:14px}
+.pos button.on{background:var(--green);color:var(--on-green);border-color:var(--green);font-weight:600}
+.pos.sub button{min-height:34px;font-size:13px;padding:0 12px}
+.pos.sub button.on{background:var(--green-bg);color:var(--green-text);border:2px solid var(--green)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px}
 .modal .box{background:var(--surface);border-radius:18px;padding:22px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:18px}
 .modal p{margin:0;font-size:15px;line-height:1.6}
@@ -148,7 +168,7 @@ var S = {
   screen: 'loading', params: {}, draft: null, draftKey: null, dirty: false,
   code: '', loginMsg: '', loginLocked: false,
   qNew: '', filterNew: 'all', tabNew: 'active', yearNew: 'all', openFam: {}, qPat: '', filterPat: 'all', qPreg: '', filterPreg: 'all',
-  photo: {}, busy: 0, err: {}
+  photo: {}, busy: 0, err: {}, memo: null
 };
 var EDU = ['1강', '2강', '3강', '4강'];
 var NEW_EDITABLE = ['관계', '신앙세대주', '이름', '성별', '연생', '등록일', '인도자', '1강', '2강', '3강', '4강', '등록심방', '전도회', '목장연결', '목장', '신급', '수료식'];
@@ -334,12 +354,12 @@ function loadData(quiet) {
 /* ---------- 화면 전환 ---------- */
 function isForm() { return S.screen === 'newRegister' || S.screen === 'patDetail' || S.screen === 'pregDetail' || (S.screen === 'newDetail' && canEditNew()); }
 function go(screen, params) {
-  S.screen = screen; S.params = params || {}; S.draftKey = null; S.dirty = false; S.err = {};
+  S.screen = screen; S.params = params || {}; S.draftKey = null; S.dirty = false; S.err = {}; S.memo = null;
   render();
   window.scrollTo(0, 0);
 }
 function leave(screen, params) {
-  if (S.dirty) {
+  if (S.dirty || memoPending()) {
     confirmBox('저장하지 않은 내용이 있어요. 그래도 나갈까요?', '나가기').then(function (ok) { if (ok) go(screen, params); });
   } else go(screen, params);
 }
@@ -945,18 +965,18 @@ R.patDetail = function () {
         '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><span class="serif" style="font-size:26px">' + esc(d['이름'] || (id ? '' : '새 환우')) + (d['직분'] ? ' <span style="font-family:inherit;font-size:16px;font-weight:500;color:var(--sub)">' + esc(d['직분']) + '</span>' : '') + '</span><span class="muted" style="font-size:13px">' + esc([d['성별'], birthLabel(d['연생'])].filter(String).join(' · ')) + '</span><span style="align-self:flex-start">' + statusChip(d['상황']) + '</span></div></div>' +
       (d['다음진료일'] ? '<section style="padding:16px 18px;border-radius:18px;background:var(--rose-bg);display:flex;align-items:center;gap:14px;color:var(--rose-text)"><span style="width:48px;height:48px;border-radius:14px;background:var(--surface);display:flex;align-items:center;justify-content:center">' + I.cal + '</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span class="small">다음 진료 예정일</span><span style="font-size:18px;font-weight:700">' + esc(Number(d['다음진료일'].slice(5, 7)) + '월 ' + Number(d['다음진료일'].slice(8, 10)) + '일 (' + weekday(d['다음진료일']) + ')') + '</span></span><span style="font-size:22px;font-weight:700">' + dLabel(n) + '</span></section>' : '') +
       '<section class="card sec"><h2>기본 정보</h2>' +
-        '<div class="grid2">' + inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') + inputField('직분', '직분', d['직분'], 'type="text" maxlength="20" placeholder="예) 권사"') + '</div>' +
+        inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') +
         '<div class="field">성별' + seg('성별', ['남', '여'], d['성별'], 2) + '</div>' +
         inputField('연생 (예: 1951)', '연생', d['연생'], 'type="text" inputmode="numeric" maxlength="4"') +
         inputField('병명', '병명', d['병명'], 'type="text" maxlength="100"') +
         inputField('병원', '병원', d['병원'], 'type="text" maxlength="100"') +
         inputField('다음 진료 예정일', '다음진료일', d['다음진료일'], 'type="date" data-ch="set"') +
-      '</section>' +
+      '</section>' + posCard(d) +
       '<section class="card sec"><div class="row-between"><h2>최근 통화</h2>' + (d['최근통화'] ? '<span class="small" style="font-weight:700;color:' + (dayDiff(d['최근통화']) < -14 ? 'var(--rose-text)' : 'var(--green-text)') + '">' + dLabel(dayDiff(d['최근통화'])) + '</span>' : '') + '</div>' +
         '<div style="display:flex;gap:8px;align-items:flex-end"><div style="flex:1">' + inputField('통화한 날짜', '최근통화', d['최근통화'], 'type="date" data-ch="set"') + '</div><button type="button" class="btn line" style="min-height:44px" data-act="callToday">오늘 통화</button></div>' +
       '</section>' +
-      '<section class="card sec"><h2>현재 상황</h2>' + seg('상황', STATUSES, d['상황'], 3) +
-        '<label class="field">상황 메모<textarea rows="4" maxlength="1000" data-f="상황메모" placeholder="예) OO병으로 진단받고 OO치료 후 회복중.">' + esc(d['상황메모']) + '</textarea></label></section>' +
+      '<section class="card sec"><h2>현재 상황</h2>' + seg('상황', STATUSES, d['상황'], 3) + '</section>' +
+      memoCard('pat', id, d) +
       '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
       '<button type="button" class="btn wide" data-act="savePat">저장</button>' +
       (id ? '<p class="muted small" style="text-align:center;margin:0">마지막 수정 · ' + esc(p['수정일시'] || '—') + '</p><button type="button" class="btn danger" data-act="delPat">명단에서 삭제</button>' : '') +
@@ -1019,10 +1039,10 @@ R.pregDetail = function () {
         '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><span class="serif" style="font-size:26px">' + esc(d['이름'] || (id ? '' : '새로 등록')) + (d['직분'] ? ' <span style="font-family:inherit;font-size:16px;font-weight:500;color:var(--sub)">' + esc(d['직분']) + '</span>' : '') + '</span><span class="muted" style="font-size:13px">' + esc(sub) + '</span></div></div>' +
       (d['출산예정일'] ? '<section style="padding:16px 18px;border-radius:18px;background:var(--pink-bg);display:flex;align-items:center;gap:14px;color:var(--pink-text)"><span style="width:48px;height:48px;border-radius:14px;background:var(--surface);display:flex;align-items:center;justify-content:center">' + I.cal + '</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span class="small">출산 예정일</span><span style="font-size:18px;font-weight:700">' + esc(Number(d['출산예정일'].slice(5, 7)) + '월 ' + Number(d['출산예정일'].slice(8, 10)) + '일 (' + weekday(d['출산예정일']) + ')') + '</span></span><span style="font-size:22px;font-weight:700">' + dLabel(n) + '</span></section>' : '') +
       '<section class="card sec"><h2>기본 정보</h2>' +
-        '<div class="grid2">' + inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') + inputField('직분', '직분', d['직분'], 'type="text" maxlength="20" placeholder="예) 집사"') + '</div>' +
+        inputField('이름', '이름', d['이름'], 'type="text" maxlength="40" autocomplete="off"') +
         inputField('연생 (예: 1992)', '연생', d['연생'], 'type="text" inputmode="numeric" maxlength="4"') +
         inputField('출산 예정일', '출산예정일', d['출산예정일'], 'type="date" data-ch="set"') +
-      '</section>' +
+      '</section>' + posCard(d) +
       '<section class="card sec"><h2>아기</h2>' +
         '<div class="field">성별' + seg('아기성별', BABY, d['아기성별'], 3) + '</div>' +
         '<div class="field">몇째' + seg('몇째', ORDERS, d['몇째'], 4) + '</div>' +
@@ -1033,13 +1053,123 @@ R.pregDetail = function () {
         '<div class="grid2">' + inputField('입소일', '조리원입소', d['조리원입소'], 'type="date" data-ch="set"') + inputField('퇴소일', '조리원퇴소', d['조리원퇴소'], 'type="date" data-ch="set"') + '</div>' +
         (d['조리원입소'] && d['조리원퇴소'] && d['조리원퇴소'] >= d['조리원입소'] ? '<span class="muted small">' + (dayDiff(d['조리원퇴소']) - dayDiff(d['조리원입소']) + 1) + '일 동안 · 심방 계획에 참고하세요</span>' : '') +
       '</section>' +
-      '<section class="card sec"><label class="field" style="font-size:15px;font-weight:700;color:var(--text)">메모<textarea rows="3" maxlength="1000" data-f="메모" placeholder="기도제목 등">' + esc(d['메모']) + '</textarea></label></section>' +
+      memoCard('preg', id, d) +
       '<div class="err" role="alert">' + esc(S.err.form || '') + '</div>' +
       '<button type="button" class="btn wide" data-act="savePreg">저장</button>' +
       (id ? '<p class="muted small" style="text-align:center;margin:0">마지막 수정 · ' + esc(p['수정일시'] || '—') + '</p><button type="button" class="btn danger" data-act="delPreg">명단에서 삭제</button>' : '') +
       footer() +
     '</div>';
 };
+
+/* ---------- 직분 고르기 ---------- */
+var POS_MAIN = ['성도', '장로', '집사', '권사'];
+var POS_SUB = {
+  '장로': ['시무', '협동', '원로', '은퇴', '협동은퇴'],
+  '집사': ['서리', '안수', '명예', '협동안수', '은퇴안수', '협동은퇴안수'],
+  '권사': ['시무', '협동', '은퇴', '협동은퇴']
+};
+function posParse(v, direct) {
+  v = String(v || '').trim();
+  if (direct) return { main: '직접 입력', sub: '' };
+  if (!v) return { main: '', sub: '' };
+  if (POS_MAIN.indexOf(v) >= 0) return { main: v, sub: '' };
+  for (var m in POS_SUB) {
+    for (var i = 0; i < POS_SUB[m].length; i++) if (v === POS_SUB[m][i] + m) return { main: m, sub: POS_SUB[m][i] };
+  }
+  return { main: '직접 입력', sub: '' };
+}
+function posCard(d) {
+  var P = posParse(d['직분'], d.__posDirect);
+  var h = '<section class="card sec"><h2>직분</h2><div class="pos" role="group" aria-label="직분">' +
+    POS_MAIN.concat(['직접 입력']).map(function (m) {
+      return '<button type="button" class="' + (P.main === m ? 'on' : '') + '" aria-pressed="' + (P.main === m) + '" data-act="posMain" data-v="' + esc(m) + '">' + esc(m) + '</button>';
+    }).join('') + '</div>';
+  if (POS_SUB[P.main]) {
+    h += '<span class="muted small">세부 (고르지 않아도 돼요)</span><div class="pos sub" role="group" aria-label="세부 직분">' +
+      POS_SUB[P.main].map(function (x) {
+        return '<button type="button" class="' + (P.sub === x ? 'on' : '') + '" aria-pressed="' + (P.sub === x) + '" data-act="posSub" data-v="' + esc(x) + '">' + esc(x) + '</button>';
+      }).join('') + '</div>';
+  }
+  if (P.main === '직접 입력') h += '<input class="inp" type="text" maxlength="20" aria-label="직분 직접 입력" placeholder="예) 목사, 선교사" data-f="직분" value="' + esc(d['직분']) + '">';
+  if (d['직분'] && P.main !== '직접 입력') h += '<span class="muted small">이름 옆에 이렇게 보여요 → <b style="color:var(--text);font-size:15px">' + esc((d['이름'] || '') + ' ' + d['직분']) + '</b></span>';
+  return h + '</section>';
+}
+
+/* ---------- 메모 기록 ---------- */
+var MEMO_KEYS = { pat: { memo: '상황메모', hist: '상황메모기록', title: '상황 메모', ph: '예) OO병으로 진단받고 OO치료 후 회복중.' },
+                  preg: { memo: '메모', hist: '메모기록', title: '메모', ph: '기도제목 등' } };
+function memoList(o, kind) {
+  var K = MEMO_KEYS[kind], list = [];
+  try { list = JSON.parse(o[K.hist] || '[]'); } catch (e) { list = []; }
+  if (!Array.isArray(list)) list = [];
+  if (!list.length && String(o[K.memo] || '').trim()) list = [{ id: 'm0', d: '', t: String(o[K.memo]) }];
+  return list;
+}
+function memoPending() { return !!(S.memo && S.memo.mode !== 'view' && String(S.memo.text || '').trim()); }
+function memoDate(m) {
+  if (!m.d) return '예전에 적은 메모';
+  return m.d.replace(/-/g, '. ') + ' (' + weekday(m.d) + ') 작성' + (m.e ? ' · ' + m.e.slice(5).replace('-', '.') + ' 고침' : '');
+}
+function memoCard(kind, id, d) {
+  var K = MEMO_KEYS[kind];
+  if (!id) return '<section class="card sec"><label class="field" style="font-size:15px;font-weight:700;color:var(--text)">' + K.title + '<textarea rows="4" maxlength="1000" data-f="' + K.memo + '" placeholder="' + esc(K.ph) + '">' + esc(d[K.memo]) + '</textarea></label></section>';
+  var list = memoList(d, kind), last = list.length - 1;
+  var M = S.memo && S.memo.key === kind + ':' + id ? S.memo : (S.memo = { key: kind + ':' + id, idx: null, mode: 'view', text: '' });
+  if (M.idx !== null && (M.idx < 0 || M.idx > last)) M.idx = null;
+  var i = M.idx === null ? last : M.idx;
+  var h = '<section class="card sec" id="memoCard">';
+  if (M.mode !== 'view') {
+    var ref = M.mode === 'add' ? list[last] : null;
+    h += '<div class="memo-head"><h2>' + (M.mode === 'add' ? '새 ' + K.title + ' 쓰기' : K.title + ' 고치기') + '</h2><span class="muted small">' + (M.mode === 'add' ? (list.length + 1) + '번째 기록' : (i + 1) + '번째 기록') + '</span></div>' +
+      '<textarea class="inp" style="height:auto;min-height:110px;padding:10px 12px;line-height:1.6;resize:vertical" rows="4" maxlength="1000" aria-label="' + K.title + '" data-memo="1" placeholder="' + esc(K.ph) + '">' + esc(M.text) + '</textarea>' +
+      (ref ? '<div class="memo-prev"><span class="small muted">직전 메모 · ' + esc(ref.d ? ref.d.slice(5).replace('-', '.') : '예전') + '</span><span class="t">' + esc(ref.t) + '</span></div>' : '') +
+      '<div class="acts2"><button type="button" class="btn line" data-act="memoCancel">취소</button><button type="button" class="btn" data-act="memoSave">' + (M.mode === 'add' ? '메모 추가' : '고친 내용 저장') + '</button></div>' +
+      (M.mode === 'edit' ? '<button type="button" class="linkbtn" style="color:var(--rose-text);align-self:center" data-act="memoDel">이 메모 지우기</button>' : '');
+    return h + '</section>';
+  }
+  if (!list.length) {
+    return h + '<h2>' + K.title + '</h2><p class="muted" style="margin:0;font-size:14px">아직 적은 메모가 없어요.</p><button type="button" class="btn" data-act="memoAdd">+ 새 메모 쓰기</button></section>';
+  }
+  var m = list[i];
+  h += '<div class="memo-head"><h2>' + K.title + '</h2>' + (list.length > 1 ? '<div class="pager"><button type="button" class="ibtn" data-act="memoPrev" aria-label="이전 메모"' + (i === 0 ? ' disabled' : '') + '>' + I.back + '</button><b>' + (i + 1) + '</b>&nbsp;/ ' + list.length + '<button type="button" class="ibtn" data-act="memoNext" aria-label="다음 메모"' + (i === last ? ' disabled' : '') + '>' + I.right + '</button></div>' : '') + '</div>' +
+    '<div class="memo-swipe" style="display:flex;flex-direction:column;gap:12px;touch-action:pan-y">' +
+    '<div class="memo-date">' + esc(memoDate(m)) + (i === last ? (list.length > 1 ? '<span class="chip green">최신</span>' : '') : '<span class="chip gray">이전 기록</span>') + '</div>' +
+    '<p class="memo-text">' + esc(m.t) + '</p>' +
+    (i === last && last > 0 ? '<div class="memo-prev"><span class="small muted">직전 메모 · ' + esc(list[last - 1].d ? list[last - 1].d.slice(5).replace('-', '.') : '예전') + '</span><span class="t">' + esc(list[last - 1].t) + '</span></div>' : '') +
+    '</div>' +
+    (list.length > 1 && list.length <= 12 ? '<div class="mdots" aria-hidden="true">' + list.map(function (x, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') + '</div>' : '') +
+    '<div class="acts2"><button type="button" class="btn line" data-act="memoEdit">고치기</button>' + (i === last ? '<button type="button" class="btn" data-act="memoAdd">+ 새 메모 쓰기</button>' : '<button type="button" class="btn line" data-act="memoLatest">최신으로</button>') + '</div>';
+  return h + '</section>';
+}
+function memoCtx() {
+  var kind = S.screen === 'patDetail' ? 'pat' : 'preg';
+  return { kind: kind, id: S.params.id, K: MEMO_KEYS[kind], list: memoList(S.draft, kind) };
+}
+function memoFocus() { setTimeout(function () { var t = document.querySelector('textarea[data-memo]'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 30); }
+function memoGo(i) { var c = memoCtx(); S.memo.idx = i >= c.list.length - 1 ? null : Math.max(0, i); rerender(); }
+function memoIdx() { var c = memoCtx(); return S.memo.idx === null ? c.list.length - 1 : S.memo.idx; }
+function memoSend(op) {
+  var c = memoCtx();
+  return call('saveMemo', [S.token, c.kind, c.id, op]).then(function (res) {
+    var json = res.list.length ? JSON.stringify(res.list) : '';
+    var rec = c.kind === 'pat' ? findPat(c.id) : findPreg(c.id);
+    [rec, S.draft].forEach(function (o) { if (o) { o[c.K.hist] = json; o[c.K.memo] = res.memo; } });
+    return res;
+  });
+}
+document.addEventListener('touchstart', function (e) {
+  var z = e.target.closest && e.target.closest('.memo-swipe');
+  S.swipe = z ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+}, { passive: true });
+document.addEventListener('touchend', function (e) {
+  if (!S.swipe || !S.memo) return;
+  var dx = e.changedTouches[0].clientX - S.swipe.x, dy = e.changedTouches[0].clientY - S.swipe.y;
+  S.swipe = null;
+  if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  var i = memoIdx(), n = memoCtx().list.length;
+  if (dx < 0 && i < n - 1) memoGo(i + 1);
+  else if (dx > 0 && i > 0) memoGo(i - 1);
+}, { passive: true });
 
 /* ---------- 입력 처리 ---------- */
 function setPath(path, val) {
@@ -1058,6 +1188,7 @@ document.addEventListener('input', function (e) {
   if (el.getAttribute('data-q') === 'preg') { S.qPreg = el.value; document.getElementById('listArea').innerHTML = pregItems(); return; }
   if (el.getAttribute('data-q') === 'pat') { S.qPat = el.value; document.getElementById('listArea').innerHTML = patItems(); return; }
   if (el.getAttribute('data-code')) { S.code = el.value.replace(/\D/g, '').slice(0, 8); return; }
+  if (el.getAttribute('data-memo') && S.memo) { S.memo.text = el.value; return; }
   var f = el.getAttribute('data-f');
   if (f && !el.getAttribute('data-ch') && S.draft) setPath(f, el.value);
 });
@@ -1182,6 +1313,52 @@ var A = {
   toggleFam: function (el) { var id = el.getAttribute('data-id'); S.openFam[id] = !S.openFam[id]; rerender(); },
   openNew: function (el) { go('newDetail', { id: el.getAttribute('data-id') }); },
   openPat: function (el) { go('patDetail', { id: el.getAttribute('data-id') }); },
+  posMain: function (el) {
+    var v = el.getAttribute('data-v'), P = posParse(S.draft['직분'], S.draft.__posDirect);
+    if (v === '직접 입력') {
+      if (P.main !== '직접 입력') { S.draft.__posDirect = true; S.draft['직분'] = ''; }
+    } else {
+      S.draft.__posDirect = false;
+      S.draft['직분'] = P.main === v ? '' : v;
+    }
+    S.dirty = true; rerender();
+    if (v === '직접 입력') setTimeout(function () { var t = document.querySelector('.pos ~ input[data-f="직분"]'); if (t) t.focus(); }, 30);
+  },
+  posSub: function (el) {
+    var v = el.getAttribute('data-v'), P = posParse(S.draft['직분']);
+    if (!POS_SUB[P.main]) return;
+    S.draft['직분'] = P.sub === v ? P.main : v + P.main;
+    S.dirty = true; rerender();
+  },
+  memoPrev: function () { memoGo(memoIdx() - 1); },
+  memoNext: function () { memoGo(memoIdx() + 1); },
+  memoLatest: function () { S.memo.idx = null; rerender(); },
+  memoAdd: function () { S.memo.mode = 'add'; S.memo.text = ''; S.memo.idx = null; rerender(); memoFocus(); },
+  memoEdit: function () {
+    var c = memoCtx(), m = c.list[memoIdx()];
+    S.memo.mode = 'edit'; S.memo.editId = m.id; S.memo.text = m.t; rerender(); memoFocus();
+  },
+  memoCancel: function () {
+    var drop = function () { S.memo.mode = 'view'; S.memo.text = ''; rerender(); };
+    if (S.memo.mode === 'add' && String(S.memo.text).trim()) confirmBox('쓰던 메모를 버릴까요?', '버리기').then(function (ok) { if (ok) drop(); });
+    else drop();
+  },
+  memoSave: function () {
+    var M = S.memo, t = String(M.text || '').trim();
+    if (!t) { toast('메모 내용을 적어 주세요.'); return; }
+    memoSend(M.mode === 'add' ? { add: t } : { edit: M.editId, text: t }).then(function () {
+      var added = M.mode === 'add';
+      M.mode = 'view'; M.text = ''; if (added) M.idx = null;
+      rerender(); toast(added ? '메모를 추가했어요.' : '메모를 고쳤어요.');
+    }).catch(function () {});
+  },
+  memoDel: function () {
+    var M = S.memo;
+    confirmBox('이 메모를 지울까요? 되돌릴 수 없어요.', '지우기').then(function (ok) {
+      if (!ok) return;
+      memoSend({ del: M.editId }).then(function () { M.mode = 'view'; M.text = ''; M.idx = null; rerender(); toast('메모를 지웠어요.'); }).catch(function () {});
+    });
+  },
   callToday: function () { S.draft['최근통화'] = today(); S.dirty = true; rerender(); },
   openPreg: function (el) { go('pregDetail', { id: el.getAttribute('data-id') }); },
   filterPreg: function (el) { S.filterPreg = el.getAttribute('data-v'); rerender(); },
@@ -1190,10 +1367,13 @@ var A = {
     if (!String(d['이름'] || '').trim()) { S.err.form = '이름을 적어 주세요.'; rerender(); return; }
     if (d['연생'] && !/^\d{4}$/.test(d['연생'])) { S.err.form = '연생은 1992처럼 네 자리로 적어 주세요.'; rerender(); return; }
     if (d['조리원입소'] && d['조리원퇴소'] && d['조리원퇴소'] < d['조리원입소']) { S.err.form = '조리원 퇴소일이 입소일보다 빨라요.'; rerender(); return; }
-    PREG_EDITABLE.forEach(function (k) { if ((d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
-    if (!n) { toast('바뀐 내용이 없어요.'); return; }
+    PREG_EDITABLE.forEach(function (k) { if ((!id || k !== '메모') && (d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
+    var memo = memoPending();
+    if (!n && !memo) { toast('바뀐 내용이 없어요.'); return; }
     S.err = {};
-    call('savePregnancy', [S.token, id, changes]).then(function () {
+    (memo ? memoSend(S.memo.mode === 'add' ? { add: S.memo.text.trim() } : { edit: S.memo.editId, text: S.memo.text.trim() }) : Promise.resolve()).then(function () {
+      return n ? call('savePregnancy', [S.token, id, changes]) : null;
+    }).then(function () {
       S.dirty = false; S.draftKey = null;
       return loadData().then(function () { go('pregList'); toast('저장했어요.'); });
     }).catch(function () {});
@@ -1269,11 +1449,14 @@ var A = {
     var id = S.params.id || '', d = S.draft, p = id ? findPat(id) : {}, changes = {}, n = 0;
     if (!String(d['이름'] || '').trim()) { S.err.form = '이름을 적어 주세요.'; rerender(); return; }
     if (d['연생'] && !/^\d{4}$/.test(d['연생'])) { S.err.form = '연생은 1951처럼 네 자리로 적어 주세요.'; rerender(); return; }
-    PAT_EDITABLE.forEach(function (k) { if ((d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
-    if (!n && !d.pendingPhoto) { toast('바뀐 내용이 없어요.'); return; }
+    PAT_EDITABLE.forEach(function (k) { if ((!id || k !== '상황메모') && (d[k] || '') !== (p[k] || '')) { changes[k] = d[k] || ''; n++; } });
+    var memo = memoPending();
+    if (!n && !d.pendingPhoto && !memo) { toast('바뀐 내용이 없어요.'); return; }
     S.err = {};
     var pending = d.pendingPhoto;
-    call('savePatient', [S.token, id, changes]).then(function (res) {
+    (memo ? memoSend(S.memo.mode === 'add' ? { add: S.memo.text.trim() } : { edit: S.memo.editId, text: S.memo.text.trim() }) : Promise.resolve()).then(function () {
+      return (n || !id) ? call('savePatient', [S.token, id, changes]) : { id: id };
+    }).then(function (res) {
       if (pending) return call('uploadPhoto', [S.token, 'patient', res.id, pending.full, pending.thumb]).then(function () { return res; });
       return res;
     }).then(function (res) {
@@ -1299,6 +1482,20 @@ document.addEventListener('click', function (e) {
   if (fn) { e.preventDefault(); fn(el, e); }
 });
 
+function isTyping(el) {
+  if (!el || !el.tagName) return false;
+  if (el.isContentEditable || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') return true;
+  return el.tagName === 'INPUT' && ['radio', 'checkbox', 'button', 'submit', 'file', 'range', 'color'].indexOf((el.type || '').toLowerCase()) < 0;
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Backspace' || S.screen === 'login' || S.screen === 'loading' || e.altKey || e.ctrlKey || e.metaKey || isTyping(e.target)) return;
+  e.preventDefault();
+  if (document.querySelector('.modal')) return;
+  if (S.memo && S.memo.mode !== 'view') { A.memoCancel(); return; }
+  var b = document.querySelector('.top [data-act="back"], .top [data-act="nav"]');
+  if (b) b.click();
+  else if (S.screen !== 'home') leave('home');
+});
 document.addEventListener('keydown', function (e) {
   if (S.screen !== 'login' || document.querySelector('.modal')) return;
   if (/^\d$/.test(e.key)) { if (S.code.length < 8) S.code += e.key; S.loginMsg = ''; rerender(); e.preventDefault(); }
@@ -1325,7 +1522,7 @@ function poll() {
   if (!S.token || document.hidden || S.busy || S.screen === 'login') return;
   call('getVersion', [S.token], true).then(function (v) {
     if (v !== S.version) {
-      return loadData(true).then(function () { if (!S.dirty && !document.querySelector('.modal')) rerender(); });
+      return loadData(true).then(function () { if (!S.dirty && !memoPending() && !document.querySelector('.modal')) rerender(); });
     }
     S.lastSync = new Date();
     var l = document.getElementById('syncLabel'); if (l) l.textContent = '방금 동기화됨';

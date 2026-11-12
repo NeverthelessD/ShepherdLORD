@@ -19,14 +19,14 @@ var NEW_COLS = ['ID', '연번', '가족ID', '관계', '신앙세대주', '이름
   '사진파일ID', '사진썸네일', '1강', '2강', '3강', '4강', '등록심방', '전도회', '목장연결', '목장', '신급',
   '수료식', '완료일', '수정일시', '수정코드'];
 var PAT_COLS = ['ID', '이름', '성별', '연생', '병명', '병원', '상황', '상황메모', '다음진료일',
-  '사진파일ID', '사진썸네일', '직분', '최근통화', '수정일시', '수정코드'];
+  '사진파일ID', '사진썸네일', '직분', '최근통화', '수정일시', '수정코드', '상황메모기록'];
 var LOG_COLS = ['시간', '구분', '이름', '내용', '코드'];
 
 // 사람이 고칠 수 있는 칸 (나머지는 서버가 관리)
 var NEW_EDITABLE = ['관계', '신앙세대주', '이름', '성별', '연생', '등록일', '인도자', '1강', '2강', '3강', '4강',
   '등록심방', '전도회', '목장연결', '목장', '신급', '수료식'];
 var PAT_EDITABLE = ['이름', '성별', '연생', '병명', '병원', '상황', '상황메모', '다음진료일', '직분', '최근통화'];
-var PREG_COLS = ['ID', '이름', '연생', '아기성별', '출산예정일', '몇째', '메모', '조리원', '조리원입소', '조리원퇴소', '출산방법', '직분', '수정일시', '수정코드'];
+var PREG_COLS = ['ID', '이름', '연생', '아기성별', '출산예정일', '몇째', '메모', '조리원', '조리원입소', '조리원퇴소', '출산방법', '직분', '수정일시', '수정코드', '메모기록'];
 var PREG_EDITABLE = ['이름', '연생', '아기성별', '출산예정일', '몇째', '메모', '조리원', '조리원입소', '조리원퇴소', '출산방법', '직분'];
 
 var SETTING_CODE_MASTER = '마스터 코드';
@@ -531,7 +531,7 @@ function auth_(token) {
 }
 
 // 새 버전에서 늘어난 칸(수료식, 완료일 등)을 시트에 자동으로 더해요
-var SCHEMA = '7';
+var SCHEMA = '8';
 function migrate_() {
   var props = PropertiesService.getScriptProperties();
   if (props.getProperty('schema') === SCHEMA) return;
@@ -859,10 +859,12 @@ function savePatient(token, id, data) {
       if (!o['이름']) throw new Error('이름을 적어 주세요.');
       id = newId_('P');
       o['ID'] = id;
+      startMemo_(o, '상황메모', '상황메모기록');
       appendObj_(sh, o);
       log_('환우', o['이름'], '환우 등록', by_(roles, 'patient'));
     } else {
       var before = readRows_(SHEET_PAT).filter(function (r) { return r['ID'] === String(id); })[0];
+      delete o['상황메모']; // 메모는 saveMemo 로만 바꿔요 (기록이 지워지지 않게)
       writeRow_(sh, row, o);
       var msg = [];
       if (o['상황'] && o['상황'] !== before['상황']) msg.push('상황 ' + o['상황']);
@@ -920,10 +922,12 @@ function savePregnancy(token, id, data) {
       if (!o['이름']) throw new Error('이름을 적어 주세요.');
       id = newId_('B');
       o['ID'] = id;
+      startMemo_(o, '메모', '메모기록');
       appendObj_(sh, o);
       log_('임신', o['이름'], '임신 등록' + (o['출산예정일'] ? ' · 예정일 ' + o['출산예정일'] : ''), by_(roles, 'pregnancy'));
     } else {
       var before = readRows_(SHEET_PREG).filter(function (r) { return r['ID'] === String(id); })[0];
+      delete o['메모'];
       writeRow_(sh, row, o);
       var msg = [];
       if (o['출산예정일'] && o['출산예정일'] !== before['출산예정일']) msg.push('예정일 ' + o['출산예정일']);
@@ -1017,4 +1021,79 @@ function getPhoto(token, kind, id) {
     var blob = DriveApp.getFileById(fid).getBlob();
     return 'data:image/jpeg;base64,' + Utilities.base64Encode(blob.getBytes());
   } catch (e) { return null; }
+}
+
+/* ---------- 메모 기록 (환우 상황 메모 · 임신 메모) ----------
+   '상황메모기록' / '메모기록' 칸에 [{id, d:날짜, t:내용, e:고친 날짜}] (오래된 것 → 최신).
+   '상황메모' / '메모' 칸에는 늘 최신 메모 내용을 같이 둬요(시트에서 보기 쉽게). */
+
+var MEMO_KIND = {
+  pat: { sheet: SHEET_PAT, memo: '상황메모', hist: '상황메모기록', role: 'patient', label: '환우', what: '상황 메모' },
+  preg: { sheet: SHEET_PREG, memo: '메모', hist: '메모기록', role: 'pregnancy', label: '임신', what: '메모' }
+};
+
+function memoList_(row, memoKey, histKey) {
+  var list = [];
+  try { list = JSON.parse(row[histKey] || '[]'); } catch (e) { list = []; }
+  if (!Array.isArray(list)) list = [];
+  if (!list.length && String(row[memoKey] || '').trim()) list = [{ id: 'm0', d: '', t: String(row[memoKey]) }];
+  return list;
+}
+
+function startMemo_(o, memoKey, histKey) {
+  var t = String(o[memoKey] || '').trim();
+  o[memoKey] = t ? safe_(t, 1000) : '';
+  o[histKey] = t ? JSON.stringify([{ id: newId_('m'), d: today_(), t: t.slice(0, 1000) }]) : '';
+}
+
+// op: { add: '내용' } | { edit: 기록id, text: '내용' } | { del: 기록id }
+function saveMemo(token, kind, id, op) {
+  var K = MEMO_KIND[kind];
+  if (!K) throw new Error('잘못된 요청이에요.');
+  var roles = auth_(token);
+  need_(roles, K.role);
+  op = op || {};
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var sh = sheet_(K.sheet);
+    var row = findRow_(sh, id);
+    if (row < 0) throw new Error('찾을 수 없어요. 새로고침해 주세요.');
+    var cur = readRows_(K.sheet).filter(function (r) { return r['ID'] === String(id); })[0];
+    var list = memoList_(cur, K.memo, K.hist);
+    var msg;
+    if (op.add !== undefined) {
+      var t = String(op.add || '').trim().slice(0, 1000);
+      if (!t) throw new Error('메모 내용을 적어 주세요.');
+      list.push({ id: newId_('m'), d: today_(), t: t });
+      msg = K.what + ' 추가';
+    } else {
+      var idx = -1;
+      list.forEach(function (m, i) { if (m.id === String(op.edit || op.del)) idx = i; });
+      if (idx < 0) throw new Error('그 메모를 찾을 수 없어요. 새로고침해 주세요.');
+      if (op.del !== undefined) {
+        list.splice(idx, 1);
+        msg = K.what + ' 하나 지움';
+      } else {
+        var t2 = String(op.text || '').trim().slice(0, 1000);
+        if (!t2) throw new Error('메모 내용을 적어 주세요. 지우려면 "이 메모 지우기"를 눌러요.');
+        list[idx].t = t2;
+        list[idx].e = today_();
+        msg = K.what + ' 고침';
+      }
+    }
+    var json = JSON.stringify(list);
+    if (json.length > 45000) throw new Error('메모 기록이 너무 많아요. 오래된 메모를 몇 개 지운 뒤 다시 해 주세요.');
+    var o = {};
+    o[K.hist] = list.length ? json : '';
+    o[K.memo] = list.length ? safe_(list[list.length - 1].t, 1000) : '';
+    o['수정일시'] = now_();
+    o['수정코드'] = ROLE_LABEL[by_(roles, K.role)];
+    writeRow_(sh, row, o);
+    log_(K.label, cur['이름'], msg, by_(roles, K.role));
+    bumpVersion_();
+    return { ok: true, list: list, memo: o[K.memo] };
+  } finally {
+    lock.releaseLock();
+  }
 }
